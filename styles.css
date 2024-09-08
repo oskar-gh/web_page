@@ -25,3 +25,7 @@ footer {
     width: 100%;
     bottom: 0;
 }
+
+.subrayado {
+    text-decoration: underline;
+}
