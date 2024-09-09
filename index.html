@@ -4,19 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Página Web</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>Bienvenido a Mi Página Web</h1>
-    </header>
-    <main>
-        <p>Óscar Heras Bachiller</p>
-        <p></p>        
-        <p><a href="tabla.html" class="subrayado">La brújula de mi vida</a></p>
-    </main>
-    <footer>
-        <p>© 2024 Mi Página Web</p>
-    </footer>
+    <div class="container">
+        <!-- Menú a la izquierda -->    
+        <nav class="sidebar">
+            <ul>
+                <li>
+                    <!-- Enlace del primer elemento, es un enlace real y abrirá la página tabla.html -->
+                    <a class="toggle-menu">Currículum Vitae</a>
+                    <!-- Submenú -->
+                    <ul class="submenu">
+                        <li><a href="cv/index_cv_spanish.html">Español</a></li>
+                        <li><a href="cv/index_cv_english.html">English</a></li>
+                    </ul>
+                </li>
+                <!-- Enlaces normales -->
+                <li><a href="family/index.html">Familia</a></li>
+                <li><a href="coins/index.html">Colección de monedas</a></li>
+            </ul>
+        </nav>
+
+        <!-- Contenido principal de la página -->
+        <div class="content">
+            <header>
+                <h1>Bienvenido a Mi Página Web</h1>
+            </header>
+            <main>
+                <p><b>Óscar Heras Bachiller</b>
+                    <br>
+                    <br>
+                    <a>La brújula de mi vida</a>
+                </p>
+            </main>
+            <footer>
+                <p>© 2024 Mi Página Web</p>
+            </footer>
+        </div>
+    </div>  
+
+    <!-- Enlace al archivo JavaScript externo -->
+    <script src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,104 @@
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 80%;
+    max-width: 1000px;
+    margin: 50px auto;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Estilo del encabezado */
+header {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #eee;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 32px;
+    color: #333;
+}
+
+header h2 {
+    font-size: 18px;
+    color: #888;
+    margin-top: 5px;
+}
+
+/* Estilo para la información de contacto */
+.contact-info {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #eee;
+}
+
+.contact-info div {
+    flex: 1;
+    text-align: center;
+}
+
+.contact-info div p {
+    margin: 5px 0;
+    color: #555;
+}
+
+/* Estilo de las secciones */
+section {
+    margin-top: 30px;
+}
+
+section h3 {
+    font-size: 22px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* Estilo para las listas */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    background-color: #f0f0f0;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+ul li h4 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+ul li p {
+    margin: 5px 0;
+    color: #555;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    margin-top: 30px;
+    border-radius: 0 0 10px 10px;
+}
+
+footer p {
+    margin: 0;
+}

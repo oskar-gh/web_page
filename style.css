@@ -1,0 +1,88 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+}
+
+main {
+    padding: 1rem;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 0.5rem;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+/* Estilo general del contenedor */
+.container {
+    display: flex;
+}
+
+/* Menú lateral */
+.sidebar {
+    width: 200px;
+    background-color: #333;
+    padding: 20px;
+    height: 100vh; /* Altura completa de la pantalla */
+    box-sizing: border-box;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 10px;
+    position: relative; /* Necesario para el submenú */
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    display: block; /* Asegura que el enlace ocupe todo el espacio del li */
+    padding: 10px;
+    background-color: #333;
+    border: none;
+    cursor: pointer;
+}
+
+.sidebar ul li a:hover {
+    background-color: #444; /* Color de fondo al pasar el ratón */
+}
+
+/* Submenú oculto por defecto */
+.submenu {
+    display: none; /* Ocultar submenú inicialmente */
+    margin-left: 10px;
+}
+
+.submenu li a {
+    padding-left: 20px; /* Sangría para diferenciar los subelementos */
+}
+
+/* Submenú expandido (al hacer clic, se muestra) */
+ul li.open .submenu {
+    display: block;
+}
+
+/* Contenido principal de la página */
+.content {
+    flex-grow: 1; /* Esto hace que el contenido ocupe el resto del espacio disponible */
+    padding: 20px;
+    background-color: #781616;
+}
+
