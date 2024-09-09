@@ -3,90 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Currículum de Óscar</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Currículum Óscar Heras Bachiller</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #2E3A59;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        h1 {
+            font-size: 32px;
+            text-align: center;
+        }
+        h2 {
+            font-size: 24px;
+            border-bottom: 2px solid #E63946;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        h3 {
+            font-size: 20px;
+            color: #1D3557;
+        }
+        .contact-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .contact-info p {
+            margin: 5px 0;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .experience, .education {
+            padding: 10px;
+            background-color: #f9f9fb;
+            border-left: 4px solid #E63946;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        .highlight {
+            color: #E63946;
+            font-weight: bold;
+        }
+        .skills, .languages {
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .skills ul, .languages p {
+            margin-left: 15px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #999;
+        }
+    </style>
 </head>
 <body>
-
     <div class="container">
-        <!-- Encabezado -->
         <header>
             <h1>Óscar Heras Bachiller</h1>
-            <h2>Desarrollador Web | Ingeniero de Software</h2>
+            <div class="contact-info">
+                <p><strong>Teléfono:</strong> +34 676 69 50 43</p>
+                <p><strong>Email:</strong> oscarhb00@hotmail.com</p>
+                <p><strong>Ubicación:</strong> Madrid, España</p>
+            </div>
         </header>
 
-        <!-- Información de contacto -->
-        <div class="contact-info">
-            <div>
-                <h4>Email</h4>
-                <p>oscar.heras@example.com</p>
-            </div>
-            <div>
-                <h4>Teléfono</h4>
-                <p>+34 600 123 456</p>
-            </div>
-            <div>
-                <h4>Dirección</h4>
-                <p>Calle Falsa 123, Madrid, España</p>
-            </div>
-        </div>
-
-        <!-- Sección de habilidades -->
-        <section>
-            <h3>Habilidades</h3>
-            <ul>
-                <li>
-                    <h4>Desarrollo Web Full-Stack</h4>
-                    <p>HTML, CSS, JavaScript, React, Node.js</p>
-                </li>
-                <li>
-                    <h4>Gestión de Bases de Datos</h4>
-                    <p>MySQL, MongoDB</p>
-                </li>
-                <li>
-                    <h4>Control de Versiones</h4>
-                    <p>Git, GitHub</p>
-                </li>
-            </ul>
+        <section class="section">
+            <h2>Perfil Profesional</h2>
+            <p>Soy un analista programador y responsable de desarrollo con amplia experiencia en la gestión de equipos y proyectos en el sector energético y logístico. Mi enfoque se centra en la creación de soluciones tecnológicas avanzadas y la optimización de procesos de negocio. Me considero una persona analítica, responsable e involucrada en el negocio, siempre comprometido con la excelencia operativa.</p>
         </section>
 
-        <!-- Sección de experiencia laboral -->
-        <section>
-            <h3>Experiencia Laboral</h3>
-            <ul>
-                <li>
-                    <h4>Desarrollador Full-Stack - Empresa XYZ</h4>
-                    <p>Junio 2018 - Actualidad</p>
-                    <p>Desarrollo y mantenimiento de aplicaciones web utilizando tecnologías modernas.</p>
-                </li>
-                <li>
-                    <h4>Ingeniero de Software - Empresa ABC</h4>
-                    <p>Marzo 2015 - Mayo 2018</p>
-                    <p>Desarrollo de software a medida para clientes corporativos.</p>
-                </li>
-            </ul>
+        <section class="section">
+            <h2>Experiencia Profesional</h2>
+
+            <div class="experience">
+                <h3>Engineering Manager & Product Manager</h3>
+                <p><strong>Holaluz – Sector Energético</strong> (Sep. 2021 - Actualidad)</p>
+                <ul>
+                    <li>Lidero dos equipos en el área de Tecnología para el desarrollo de soluciones de gestión de energía, incluyendo la creación de un ERP y adaptación de datos a una plataforma DataLake.</li>
+                    <li>Gestión de proyectos relacionados con la facturación, medición y liquidación de contratos de energía, con un enfoque en Machine Learning y IA.</li>
+                </ul>
+            </div>
+
+            <div class="experience">
+                <h3>Jefe de Desarrollo de Sistemas BackOffice</h3>
+                <p><strong>ENERGYA VM (Grupo Villar Mir) – Sector Energético</strong> (Ago. 2006 - Sep. 2021)</p>
+                <ul>
+                    <li>Responsable de desarrollar aplicaciones críticas para la gestión de BackOffice, utilizando VB.Net y SQL Server.</li>
+                    <li>Gestión de equipos y recursos externos en proyectos de liquidaciones, mediciones y riesgos.</li>
+                </ul>
+            </div>
+
+            <div class="experience">
+                <h3>Jefe de Proyecto y Analista</h3>
+                <p><strong>Lógica SLI – Sector Logístico</strong> (May. 2001 - Ago. 2006)</p>
+                <ul>
+                    <li>Coordiné equipos de desarrollo y me encargué de la toma de requerimientos, análisis y gestión de proyectos en el área de desarrollo de software.</li>
+                </ul>
+            </div>
+            
+            <div class="experience">
+                <h3>Vendedor de Electrodomésticos</h3>
+                <p><strong>Hipercor S.A.</strong> (Ago. 1997 - Abr. 2001)</p>
+                <ul>
+                    <li>Responsable de la venta, instalación y post-venta de equipos de aire acondicionado y calefacción.</li>
+                </ul>
+            </div>
         </section>
 
-        <!-- Sección de educación -->
-        <section>
-            <h3>Educación</h3>
-            <ul>
-                <li>
-                    <h4>Grado en Ingeniería Informática - Universidad de Madrid</h4>
-                    <p>2009 - 2013</p>
-                </li>
-                <li>
-                    <h4>Máster en Desarrollo Web - Universidad XYZ</h4>
-                    <p>2014 - 2015</p>
-                </li>
-            </ul>
+        <section class="section">
+            <h2>Formación</h2>
+
+            <div class="education">
+                <h3>Técnico en Informática de Gestión y Sistemas</h3>
+                <p>Escuela de Sistemas Informáticos (E.S.I.) - Sep. 1998 - Jun. 2001</p>
+                <p><strong>BTEC Higher National Diploma in Business and Information Technology</strong></p>
+
+                <h3>Otros Cursos</h3>
+                <ul>
+                    <li>Fundamentos y Técnicas de Programación de MATLAB® para aplicaciones financieras (2007)</li>
+                    <li>Implementing SQL Server 2005 Database (2007)</li>
+                    <li>Desarrollo de aplicaciones Java a nivel empresarial: SPRING e HIBERNATE (2018)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Idiomas</h2>
+            <div class="languages">
+                <p>Inglés - Nivel Medio</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Competencias</h2>
+            <div class="skills">
+                <ul>
+                    <li>SQL Server, MySQL, Access, T-SQL</li>
+                    <li>Programación: Visual Basic, VB.Net, C#.Net, Java (Spring)</li>
+                    <li>Excel avanzado</li>
+                </ul>
+            </div>
         </section>
     </div>
 
-    <!-- Footer -->
     <footer>
-        <p>© 2024 Óscar Heras Bachiller. Todos los derechos reservados.</p>
+        <p>Óscar Heras Bachiller &copy; 2024</p>
     </footer>
-
 </body>
 </html>
