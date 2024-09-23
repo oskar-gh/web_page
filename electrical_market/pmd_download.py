@@ -1,4 +1,3 @@
-import requests
 import pandas as pd
 import sys
 import os
@@ -6,8 +5,8 @@ import os
 # Add the project root directory to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from datetime import datetime, timedelta
-from utils.utils import create_csv_inlocal, create_csv_inbuffer
 from ree_request import get_data_from_api
+#from utils.utils import create_csv_inlocal, create_csv_inbuffer
 
 def pmd_download():
     # Get tomorrow's date
@@ -25,8 +24,8 @@ def pmd_download():
 
     if omiepmd_df is not None:
         #create_csv_inlocal(omiepmd_df,"C:/Users/hp/Documents/Óscar","precios_omiepmd.csv")
-        csv_buffer = create_csv_inbuffer(omiepmd_df)
-        return csv
+        #csv_buffer = create_csv_inbuffer(omiepmd_df)
+        return omiepmd_df
         print("File 'prices_omiepmd.csv' created.")
 
 # Process data in a DataFrame
