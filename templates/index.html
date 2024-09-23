@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Página Web</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
@@ -16,8 +16,8 @@
                     <a class="toggle-menu">Currículum Vitae</a>
                     <!-- Submenú -->
                     <ul class="submenu">
-                        <li><a href="cv_index_cv_spanish.html" target="_blank">Español</a></li>
-                        <li><a href="cv_index_cv_english.html" target="_blank">English</a></li>
+                        <li><a href="cv_index_spanish.html" target="_blank">Español</a></li>
+                        <li><a href="cv_index_english.html" target="_blank">English</a></li>
                     </ul>
                 </li>
                 <!-- Enlaces normales -->
