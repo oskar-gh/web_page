@@ -16,14 +16,14 @@
                     <a class="toggle-menu">Currículum Vitae</a>
                     <!-- Submenú -->
                     <ul class="submenu">
-                        <li><a href="cv_index_spanish.html" target="_blank">Español</a></li>
-                        <li><a href="cv_index_english.html" target="_blank">English</a></li>
+                        <li><a href="{{ url_for('cv_index_spanish') }}" target="_blank">Español</a></li>
+                        <li><a href="{{ url_for('cv_index_english') }}" target="_blank">English</a></li>
                     </ul>
                 </li>
                 <!-- Enlaces normales -->
-                <li><a href="family_index.html">Familia</a></li>
-                <li><a href="coins_index.html">Colección de monedas</a></li>
-                <li><a href="electrical_market_index.html">Ver precios PMD OMIE</a></li>
+                <li><a href="/family_index.html">Familia</a></li>
+                <li><a href="/coins_index.html">Colección de monedas</a></li>
+                <li><a href="/electrical_market_index.html">Ver precios PMD OMIE</a></li>
                 <!--<li>
                     <form id="downloadForm" action="/download" method="post">
                         <button type="submit">Descarga precios PMD OMIE</button>
