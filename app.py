@@ -8,25 +8,25 @@ def index():
     return render_template('index.html')
 
 @app.route('/coins')
-def index():
+def coins_index():
     return render_template('coins_index.html')
 
 @app.route('/cv_spanish')
-def index():
+def cv_index_spanish():
     return render_template('cv_index_spanish.html')
 
 @app.route('/cv_english')
-def index():
+def cv_index_english():
     return render_template('cv_index_english.html')
 
 @app.route('/family')
-def index():
+def family_index():
     return render_template('family_index.html')
 
 @app.route('/electrical_market')
-def electrical_market():
+def electrical_market_index():
     df = pmd_download.pmd_download()
-    return render_template('electrical_market/index.html', prices=df.to_html(classes='data'))
+    return render_template('electrical_market_index.html', prices=df.to_html(classes='data'))
 
 if __name__ == '__main__':
     app.run(debug=True)
