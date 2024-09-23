@@ -3,6 +3,10 @@ from electrical_market import pmd_download
 
 app = Flask(__name__)
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/electrical_market')
 def electrical_market():
     df = pmd_download.pmd_download()
