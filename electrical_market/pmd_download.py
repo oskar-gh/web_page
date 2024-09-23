@@ -2,10 +2,11 @@ import pandas as pd
 import sys
 import os
 
+
 # Add the project root directory to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from datetime import datetime, timedelta
-from ree_request import get_data_from_api
+from .ree_request import get_data_from_api
 #from utils.utils import create_csv_inlocal, create_csv_inbuffer
 
 def pmd_download():
