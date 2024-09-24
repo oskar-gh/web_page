@@ -4,11 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Precios PMD OMIE</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <h1>Precios de Mercado</h1>
+
+    <!-- Formulario para elegir rango de fechas -->
+    <form action="/electrical_market_rangeprice" method="POST">
+        <label for="start_date">Fecha de inicio:</label>
+        <input type="date" id="start_date" name="start_date" required value="{{ start_date }}">
+        
+        <label for="end_date">Fecha de fin:</label>
+        <input type="date" id="end_date" name="end_date" required value="{{ end_date }}">
+        
+        <button type="submit">Consultar precios</button>
+    </form>
+
     <div>
         {{ prices|safe }}
+    </div>
 </body>
 </html>

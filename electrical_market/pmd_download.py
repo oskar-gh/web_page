@@ -9,15 +9,13 @@ from datetime import datetime, timedelta
 from .ree_request import get_data_from_api
 #from utils.utils import create_csv_inlocal, create_csv_inbuffer
 
-def pmd_download():
-    # Get tomorrow's date
-    if datetime.now().hour >= 15:
-        target_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
-    else:
-        target_date = (datetime.now()).strftime('%Y-%m-%d')
-    
+def pmd_download(start_date, end_date):
+   
+    start_date = datetime.strptime(start_date, '%Y-%m-%d').strftime('%Y-%m-%d')
+    end_date = datetime.strptime(end_date, '%Y-%m-%d').strftime('%Y-%m-%d')
+        
     # URL for daily market price indicator (OMIE_PMD - indicator 600)
-    omiepmd_url = f"https://api.esios.ree.es/indicators/600?start_date={target_date}T00:00&end_date={target_date}T23:59"
+    omiepmd_url = f"https://api.esios.ree.es/indicators/600?start_date={start_date}T00:00&end_date={end_date}T23:59"
 
     # Obtain and process daily market data
     omiepmd_data = get_data_from_api(omiepmd_url)
