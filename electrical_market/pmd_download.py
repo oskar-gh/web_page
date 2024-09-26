@@ -47,20 +47,31 @@ def process_data(data):
             df = pd.DataFrame(values)
             
             # Print the DataFrame for debugging
-            # print("DataFrame inicial:", df.head())
+            #print("DataFrame inicial:", df.head(30))
+            #print("Información del DataFrame:", df.info())
 
             # Add country column
             if 'geo_id' in df.columns and 'datetime' in df.columns and 'value' in df.columns:
                 df['datetime'] = pd.to_datetime(df['datetime'])
                 df['Fecha'] = df['datetime'].dt.date
-                df['Hora'] = df['datetime'].dt.hour
+                df['Hora'] = df['datetime'].dt.hour + 1
                 df['Precio'] = df['value'].astype(float)
                 df['País'] = df['geo_id'].map(geo_mapping)
                 
                 # Pivot the DataFrame
                 df_pivot = df.pivot_table(index=['Fecha', 'Hora'], columns='País', values='Precio')
-                df_pivot.reset_index(inplace=True)
                 
+                # Reorder the columns, ensuring that 'Spain' is the first
+                if 'España' in df_pivot.columns:
+                    # Replace 'Spain' in first position
+                    cols = ['España'] + [col for col in df_pivot.columns if col != 'España']
+                    df_pivot = df_pivot[cols]
+
+                
+                df_pivot.reset_index(inplace=True)
+                df_pivot.index = df_pivot.index + 1
+                df_pivot.columns.name = "Contador Registros"
+
                 return df_pivot
             else:
                 print("Expected columns not found in data")
