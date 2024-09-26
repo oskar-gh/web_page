@@ -32,22 +32,48 @@ def electrical_market_index():
     else:
         target_date = (datetime.now()).strftime('%Y-%m-%d')
        
-    df = pmd_download.pmd_download(target_date, target_date)
-    return render_template('electrical_market_index.html', prices=df.to_html(classes='data'))
+    df_all = pmd_download.pmd_download(target_date, target_date)
+    
+    # Seleccionar solo los precios de España
+    df_spain = df_all[['Fecha', 'Hora', 'España']]  # Seleccionar solo la columna de 'España'
+    
+    # Convertir a listas para el gráfico
+    spain_dates = df_spain.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()  # Fecha y Hora combinadas
+    spain_prices_data = df_spain['España'].tolist()  # Precios de España
 
-@app.route('/electrical_market_rangeprice', methods=['POST'])
-def consultar_precios():
+    # Renderizar la plantilla con los dos DataFrames y datos para el gráfico
+    return render_template('electrical_market_index.html', 
+                        all_prices=df_all.to_html(classes='data'), 
+                        spain_prices=df_spain.to_html(classes='data'), 
+                        spain_dates=spain_dates, 
+                        spain_prices_data=spain_prices_data,
+                        start_date=target_date, 
+                        end_date=target_date)
+
+@app.route('/electrical_market_index', methods=['POST'])
+def electrical_market_consultar_precios():
     # Obtener las fechas del formulario
+
     start_date = request.form.get('start_date')
     end_date = request.form.get('end_date')
 
-    print(f"Start Date: {start_date}, End Date: {end_date}")
+    df_all = pmd_download.pmd_download(start_date, end_date)
 
-    df = pmd_download.pmd_download(start_date, end_date)
-    return render_template('electrical_market_index.html',
-                           prices=df.to_html(classes='data'), 
-                           start_date=start_date, 
-                           end_date=end_date)
+    # Seleccionar solo los precios de España
+    df_spain = df_all[['Fecha', 'Hora', 'España']]  # Seleccionar solo la columna de 'España'
+    
+    # Convertir a listas para el gráfico
+    spain_dates = df_spain.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()  # Fecha y Hora combinadas
+    spain_prices_data = df_spain['España'].tolist()  # Precios de España
+
+    # Renderizar la plantilla con los dos DataFrames y datos para el gráfico
+    return render_template('electrical_market_index.html', 
+                        all_prices=df_all.to_html(classes='data'), 
+                        spain_prices=df_spain.to_html(classes='data'), 
+                        spain_dates=spain_dates, 
+                        spain_prices_data=spain_prices_data,
+                        start_date=start_date, 
+                        end_date=end_date)
 
 if __name__ == '__main__':
     app.run(debug=True)
