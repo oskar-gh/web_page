@@ -82,7 +82,7 @@
     <h1>Precios de Mercado</h1>
 
     <!-- Formulario para elegir rango de fechas -->
-    <form action="/electrical_market_index" method="POST" onsubmit="openTabAfterSubmit()">
+    <form action="/electrical_market_index" method="POST">
         <label for="start_date">Fecha de inicio:</label>
         <input type="date" id="start_date" name="start_date" required value="{{ start_date }}">
         
@@ -100,30 +100,27 @@
 
     <!-- Tab content for all prices -->
     <div id="AllPrices" class="tab-content active">
+        <div class="chart-container">
+            <canvas id="allPricesChart" style="width: 100%; height: 300px;"></canvas>
+        </div>
         <div class="table-container">
             {{ all_prices|safe }}
         </div>
-        <canvas id="allPricesChart" style="width: 100%; height: 400px;"></canvas>
     </div>
 
     <!-- Tab content for Spain prices and chart -->
     <div id="SpainPrices" class="tab-content">
+        <div class="chart-container">
+            <canvas id="spainPricesChart" style="width: 100%; height: 300px;"></canvas>
+        </div>
         <div class="table-container">
             {{ spain_prices|safe }}
         </div>
-        <canvas id="spainPricesChart" style="width: 100%; height: 400px;"></canvas>
     </div>
 
     <script>
-        function openTabAfterSubmit() {
-            // Llama a openTab para abrir la pestaña activa
-            // Cambia 'SpainPrices' por el ID de la pestaña que quieras abrir por defecto
-            console.log("Aqui")
-            setTimeout(function() {
-                openTab(event, 'AllPrices');
-                renderAllPricesChart();
-            }, 1000);  // Delay para dar tiempo a que el formulario se envíe antes de cambiar la pestaña
-        }
+        let allPricesChart;
+        let spainPricesChart;
 
         // Function to open tabs
         function openTab(evt, tabName) {
@@ -159,82 +156,89 @@
         // Function to render the Chart.js graph for Spain prices
         function renderSpainPricesChart() {
             const ctx = document.getElementById('spainPricesChart').getContext('2d');
+
+            // Si ya existe un gráfico, destrúyelo antes de crear uno nuevo
+            if (spainPricesChart) {
+                spainPricesChart.destroy();
+            }
             
-            // Only generate the chart if it hasn't been created yet
-            if (!ctx.chart) {
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: {{ spain_dates|tojson }},  // Replace with your backend data
-                        datasets: [{
-                            label: 'Precios España',
-                            data: {{ spain_prices_data|tojson }},  // Replace with your backend data
-                            backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                            borderColor: 'rgba(255, 206, 86, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            x: {
-                                beginAtZero: true
-                            },
-                            y: {
-                                beginAtZero: true
-                            }
+            spainPricesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ spain_dates|tojson }},  // Replace with your backend data
+                    datasets: [{
+                        label: 'Precios España',
+                        data: {{ spain_prices_data|tojson }},  // Replace with your backend data
+                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,  // Asegúrate de que el gráfico sea responsivo
+                    maintainAspectRatio: false, // Mantiene la relación de aspecto
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        },
+                        y: {
+                            beginAtZero: true
                         }
                     }
-                });
-            }
-        }       
+                }
+            });
+        }
+
         function renderAllPricesChart() {
             const ctx = document.getElementById('allPricesChart').getContext('2d');
 
+            // Si ya existe un gráfico, destrúyelo antes de crear uno nuevo
+            if (allPricesChart) {
+                allPricesChart.destroy();
+            }
+
             // Only generate the chart if it hasn't been created yet
-            if (!ctx.chart) {
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: {{ all_dates|tojson }},  // Replace with your backend data
-                        datasets: [
-                            {% for country, prices in all_prices_data.items() %}
-                            {
-                                label: '{{ country }}',  // Nombre del país
-                                data: {{ prices|tojson }},  // Precios de ese país
-                                fill: true,
-                                borderColor: getRandomColor(),  // Asignar un color aleatorio para cada país
-                                borderWidth: 1,
-                                hidden: {% if country in ['España'] %} false {% else %} true {% endif %}
-                            },
-                            {% endfor %}
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            x: {
-                                beginAtZero: false,
-                                title: {
-                                    display: true,
-                                    text: 'Fecha y Hora'
-                                }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Precios'
-                                }
-                            }
+            allPricesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ all_dates|tojson }},  // Replace with your backend data
+                    datasets: [
+                        {% for country, prices in all_prices_data.items() %}
+                        {
+                            label: '{{ country }}',  // Nombre del país
+                            data: {{ prices|tojson }},  // Precios de ese país
+                            fill: false,
+                            backgroundColor: getRandomColor(),  // Asignar un color aleatorio para cada país
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            borderWidth: 1,
+                            hidden: {% if country in ['España'] %} false {% else %} true {% endif %}
                         },
-                        plugins: {
-                            legend: {
-                                display: true,  // Mostrar leyenda
-                                position: 'top'
+                        {% endfor %}
+                    ]
+                },
+                options: {
+                    responsive: true,  // Asegúrate de que el gráfico sea responsivo
+                    maintainAspectRatio: false, // Mantiene la relación de aspecto
+                    scales: {
+                        x: {
+                            beginAtZero: false,
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Precios'
                             }
                         }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,  // Mostrar leyenda
+                            position: 'top'
+                        }
                     }
-                });
-            }
+                }
+            });
         }
         
             // Función para generar un color aleatorio en formato hexadecimal
