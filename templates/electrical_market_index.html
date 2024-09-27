@@ -82,7 +82,7 @@
     <h1>Precios de Mercado</h1>
 
     <!-- Formulario para elegir rango de fechas -->
-    <form action="/electrical_market_index" method="POST">
+    <form action="/electrical_market_index" method="POST" onsubmit="openTabAfterSubmit()">
         <label for="start_date">Fecha de inicio:</label>
         <input type="date" id="start_date" name="start_date" required value="{{ start_date }}">
         
@@ -94,7 +94,7 @@
 
     <!-- Tabs for DataFrames and Spain Chart -->
     <div class="tab">
-        <button class="tablinks" onclick="openTab(event, 'AllPrices')">Todos los Precios</button>
+        <button class="tablinks" onclick="openTab(event, 'AllPrices')">Precios Europa</button>
         <button class="tablinks" onclick="openTab(event, 'SpainPrices')">Precios España</button>
     </div>
 
@@ -103,6 +103,7 @@
         <div class="table-container">
             {{ all_prices|safe }}
         </div>
+        <canvas id="allPricesChart" style="width: 100%; height: 400px;"></canvas>
     </div>
 
     <!-- Tab content for Spain prices and chart -->
@@ -114,6 +115,16 @@
     </div>
 
     <script>
+        function openTabAfterSubmit() {
+            // Llama a openTab para abrir la pestaña activa
+            // Cambia 'SpainPrices' por el ID de la pestaña que quieras abrir por defecto
+            console.log("Aqui")
+            setTimeout(function() {
+                openTab(event, 'AllPrices');
+                renderAllPricesChart();
+            }, 1000);  // Delay para dar tiempo a que el formulario se envíe antes de cambiar la pestaña
+        }
+
         // Function to open tabs
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
@@ -137,6 +148,11 @@
             // If the Spain Prices tab is selected, render the chart
             if (tabName === 'SpainPrices') {
                 renderSpainPricesChart();
+            }
+
+            //If the Spain Prices tab is selected, render the chart
+            if (tabName === 'AllPrices') {
+                renderAllPricesChart();
             }
         }
 
@@ -170,7 +186,66 @@
                     }
                 });
             }
-        }            
+        }       
+        function renderAllPricesChart() {
+            const ctx = document.getElementById('allPricesChart').getContext('2d');
+
+            // Only generate the chart if it hasn't been created yet
+            if (!ctx.chart) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: {{ all_dates|tojson }},  // Replace with your backend data
+                        datasets: [
+                            {% for country, prices in all_prices_data.items() %}
+                            {
+                                label: '{{ country }}',  // Nombre del país
+                                data: {{ prices|tojson }},  // Precios de ese país
+                                fill: true,
+                                borderColor: getRandomColor(),  // Asignar un color aleatorio para cada país
+                                borderWidth: 1,
+                                hidden: {% if country in ['España'] %} false {% else %} true {% endif %}
+                            },
+                            {% endfor %}
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                beginAtZero: false,
+                                title: {
+                                    display: true,
+                                    text: 'Fecha y Hora'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Precios'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,  // Mostrar leyenda
+                                position: 'top'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+            // Función para generar un color aleatorio en formato hexadecimal
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
