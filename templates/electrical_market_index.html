@@ -294,8 +294,14 @@
         }
 
         document.getElementById("downloadCsv").addEventListener("click", function() {
+            document.getElementById('spinner').style.display = 'block';
             // Realiza una solicitud para descargar el CSV
             window.location.href = '/download_csv';
+
+            // Oculta el spinner después de 1 segundo
+            setTimeout(function() {
+                document.getElementById('spinner').style.display = 'none';
+            }, 1000); // Ajusta el tiempo según lo necesites
         });
 
         document.querySelector('form').addEventListener('submit', function() {
