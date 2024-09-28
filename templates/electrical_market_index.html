@@ -92,6 +92,22 @@
             height: 50px; /* Ajusta el tamaño del icono */
         }
         
+        #spinner {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000; /* Asegúrate de que esté por encima de otros elementos */
+            background: rgba(255, 255, 255, 0); /* Fondo semi-transparente */
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        #spinner img {
+            width: 200px;
+            height: 200px;
+        }
+
     </style>
 </head>
 <body>
@@ -101,7 +117,6 @@
     <a href="/" class="home-button" title="Volver a la página principal">
         <img src="{{ url_for('static', filename='complements/compass.png') }}" alt="Inicio">
     </a>
-
 
     <!-- Formulario para elegir rango de fechas -->
     <form action="/electrical_market_index" method="POST">
@@ -115,6 +130,9 @@
         <button type="button" id="downloadCsv">Descargar CSV</button> 
     </form>
 
+    <div id="spinner" style="display:none;">
+        <img src="{{ url_for('static', filename='complements/spinner_compass.gif') }}" alt="Cargando..." />
+    </div>
 
     <!-- Tabs for DataFrames and Spain Chart -->
     <div class="tab">
@@ -276,8 +294,18 @@
         }
 
         document.getElementById("downloadCsv").addEventListener("click", function() {
+            document.getElementById('spinner').style.display = 'block';
             // Realiza una solicitud para descargar el CSV
             window.location.href = '/download_csv';
+
+            // Oculta el spinner después de 1 segundo
+            setTimeout(function() {
+                document.getElementById('spinner').style.display = 'none';
+            }, 1000); // Ajusta el tiempo según lo necesites
+        });
+
+        document.querySelector('form').addEventListener('submit', function() {
+            document.getElementById('spinner').style.display = 'block';
         });
 
     </script>
