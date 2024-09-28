@@ -60,9 +60,6 @@ def process_data(data):
                 df['Precio'] = df['value'].astype(float)
                 df['País'] = df['geo_id'].map(geo_mapping)
 
-                
-                print("DataFrame inicial:", df.head(300))
-                
                 #df_sorted = df.sort_values(by=['Fecha', 'Hora', 'Horario_orden'])
                 
                 # Pivot the DataFrame
