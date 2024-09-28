@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 from electrical_market import pmd_download
+import os
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 
@@ -41,7 +42,11 @@ def electrical_market_index():
        
     df_all = pmd_download.pmd_download(start_date, end_date)
     
-    print("DataFrame inicial:", df_all.head(30))
+    #save csv to future downloads
+    csv_file_path = os.path.join('data', 'prices.csv')
+    df_all.to_csv(csv_file_path, index=False)
+    
+    #print("DataFrame inicial:", df_all.head(30))
     
     # Seleccionar solo los precios de España
     df_spain = df_all[['Fecha', 'Hora', 'Horario', 'España']]  # Seleccionar solo la columna de 'España'
@@ -53,7 +58,7 @@ def electrical_market_index():
     # Convertir a listas para el gráfico de todo
     all_dates = df_spain.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()  # Fecha y Hora combinadas
     all_prices_data = {country: df_all[country].tolist() for country in df_all.columns if country not in ['Fecha', 'Hora', 'Horario']}
-
+        
     # Renderizar la plantilla con los dos DataFrames y datos para el gráfico
     return render_template('electrical_market_index.html', 
                         all_prices=df_all.to_html(classes='data'), 
@@ -64,6 +69,11 @@ def electrical_market_index():
                         all_prices_data=all_prices_data,
                         start_date=start_date, 
                         end_date=end_date)
+
+@app.route('/download_csv')
+def download_csv():
+    csv_file_path = os.path.join(os.getcwd(), 'data', 'prices.csv')
+    return send_file(csv_file_path, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True)

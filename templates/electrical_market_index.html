@@ -112,7 +112,9 @@
         <input type="date" id="end_date" name="end_date" required value="{{ end_date }}">
         
         <button type="submit">Consultar precios</button>
+        <button type="button" id="downloadCsv">Descargar CSV</button> 
     </form>
+
 
     <!-- Tabs for DataFrames and Spain Chart -->
     <div class="tab">
@@ -272,6 +274,12 @@
             }
             return color;
         }
+
+        document.getElementById("downloadCsv").addEventListener("click", function() {
+            // Realiza una solicitud para descargar el CSV
+            window.location.href = '/download_csv';
+        });
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
