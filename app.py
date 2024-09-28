@@ -41,8 +41,10 @@ def electrical_market_index():
        
     df_all = pmd_download.pmd_download(start_date, end_date)
     
+    print("DataFrame inicial:", df_all.head(30))
+    
     # Seleccionar solo los precios de España
-    df_spain = df_all[['Fecha', 'Hora', 'España']]  # Seleccionar solo la columna de 'España'
+    df_spain = df_all[['Fecha', 'Hora', 'Horario', 'España']]  # Seleccionar solo la columna de 'España'
     
     # Convertir a listas para el gráfico solo  España
     spain_dates = df_spain.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()  # Fecha y Hora combinadas
@@ -50,7 +52,7 @@ def electrical_market_index():
     
     # Convertir a listas para el gráfico de todo
     all_dates = df_spain.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()  # Fecha y Hora combinadas
-    all_prices_data = {country: df_all[country].tolist() for country in df_all.columns if country not in ['Fecha', 'Hora']}
+    all_prices_data = {country: df_all[country].tolist() for country in df_all.columns if country not in ['Fecha', 'Hora', 'Horario']}
 
     # Renderizar la plantilla con los dos DataFrames y datos para el gráfico
     return render_template('electrical_market_index.html', 

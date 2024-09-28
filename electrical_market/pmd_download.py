@@ -47,19 +47,29 @@ def process_data(data):
             df = pd.DataFrame(values)
             
             # Print the DataFrame for debugging
-            #print("DataFrame inicial:", df.head(30))
+            #print("DataFrame inicial:", df.head(300))
             #print("Información del DataFrame:", df.info())
 
             # Add country column
             if 'geo_id' in df.columns and 'datetime' in df.columns and 'value' in df.columns:
-                df['datetime'] = pd.to_datetime(df['datetime'])
+                df['datetime'] = pd.to_datetime(df['datetime_utc']).dt.tz_convert('Europe/Madrid')
                 df['Fecha'] = df['datetime'].dt.date
                 df['Hora'] = df['datetime'].dt.hour + 1
+                df['Horario'] = df['datetime'].apply(lambda x: 'Verano' if x.dst() != pd.Timedelta(0) else 'Invierno')
+                df['Horario_orden'] = df['datetime'].apply(lambda x: 0 if x.dst() != pd.Timedelta(0) else 1).astype(int)
                 df['Precio'] = df['value'].astype(float)
                 df['País'] = df['geo_id'].map(geo_mapping)
+
+                
+                print("DataFrame inicial:", df.head(300))
+                
+                #df_sorted = df.sort_values(by=['Fecha', 'Hora', 'Horario_orden'])
                 
                 # Pivot the DataFrame
-                df_pivot = df.pivot_table(index=['Fecha', 'Hora'], columns='País', values='Precio')
+                df_pivot = df.pivot_table(index=['Fecha', 'Hora', 'Horario_orden', 'Horario'], columns='País', values='Precio', aggfunc='first')
+                
+                #print("DataFrame inicial:", df_pivot.head(300))
+                
                 
                 # Reorder the columns, ensuring that 'Spain' is the first
                 if 'España' in df_pivot.columns:
@@ -71,6 +81,7 @@ def process_data(data):
                 df_pivot.reset_index(inplace=True)
                 df_pivot.index = df_pivot.index + 1
                 df_pivot.columns.name = "Contador Registros"
+                df_pivot = df_pivot.drop(columns=['Horario_orden'])
 
                 return df_pivot
             else:
