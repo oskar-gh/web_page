@@ -128,6 +128,7 @@
         
         <button type="submit">Consultar precios</button>
         <button type="button" id="downloadCsv">Descargar CSV</button> 
+        <button type="button" id="updateRee">Actualizar datos de REE</button> 
     </form>
 
     <div id="spinner" style="display:none;">
@@ -160,6 +161,7 @@
         </div>
     </div>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         let allPricesChart;
         let spainPricesChart;
@@ -304,9 +306,36 @@
             }, 1000); // Ajusta el tiempo según lo necesites
         });
 
+        // Evento para actualizar datos de REE
+        document.getElementById("updateRee").addEventListener("click", function() {
+            document.getElementById('spinner').style.display = 'block'; // Mostrar el spinner
+            $.ajax({
+                url: '/updateRee', // URL de la ruta de Flask
+                type: 'GET',
+                error: function(xhr, status, error) {
+                    console.error('Error en la actualización:', error); // Maneja errores
+                },
+                complete: function() {
+                    console.log('Actualización completada'); // Maneja la respuesta si es necesario
+                    document.getElementById('spinner').style.display = 'none'; // Ocultar el spinner
+                }
+            });
+        });
+
         document.querySelector('form').addEventListener('submit', function() {
             document.getElementById('spinner').style.display = 'block';
+            //const startTime = Date.now();
+            //console.log("Termina: " + new Date(startTime).toLocaleTimeString());
         });
+        
+        //window.addEventListener('load', function() {
+            //const endTime = Date.now();
+            //console.log("Respuesta recibida del servidor a las: " + new Date(endTime).toLocaleTimeString());
+
+        
+            //// Ocultar el spinner al recibir la respuesta
+            //document.getElementById('spinner').style.display = 'none';
+        //});
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

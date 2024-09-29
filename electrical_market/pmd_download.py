@@ -1,34 +1,51 @@
 import pandas as pd
 import sys
 import os
+from datetime import datetime
+import calendar
 
 
 # Add the project root directory to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from datetime import datetime, timedelta
 from .ree_request import get_data_from_api
-#from utils.utils import create_csv_inlocal, create_csv_inbuffer
 
-def pmd_download(start_date, end_date):
-   
-    start_date = datetime.strptime(start_date, '%Y-%m-%d').strftime('%Y-%m-%d')
-    end_date = datetime.strptime(end_date, '%Y-%m-%d').strftime('%Y-%m-%d')
+
+def update_ree():
+    ####
+    #time = datetime.now()
+    #print(f"Comienzo: {time}")
+    ####
+    csv_file_path = os.path.join(os.getcwd(), 'data', 'pricesBDD.csv')
+    
+    print(csv_file_path)
+    
+    # Verificar si el archivo existe
+    if os.path.exists(csv_file_path):
+        # Leer el CSV en un DataFrame
+        df = pd.read_csv(csv_file_path, parse_dates=['Fecha']) 
+        max_date = df['Fecha'].max() + timedelta(days=1)
+    else:
+        # Restar dos años a la fecha actual y fijarla al 1 de enero
+        max_date = datetime(datetime.now().year - 2, 1, 1)
+        
+    last_day_of_month = calendar.monthrange(max_date.year, max_date.month)[1]
+    start_date = max_date.date()
+    end_date = datetime(start_date.year, start_date.month, last_day_of_month).date()
+
+    #print(f"Comienzo: {start_date}")
+    #print(f"Fin: {end_date}")
         
     # URL for daily market price indicator (OMIE_PMD - indicator 600)
     omiepmd_url = f"https://api.esios.ree.es/indicators/600?start_date={start_date}T00:00&end_date={end_date}T23:59"
 
     # Obtain and process daily market data
     omiepmd_data = get_data_from_api(omiepmd_url)
-    omiepmd_df = process_data(omiepmd_data)
+    omiepmd_df = pmd_process_data(omiepmd_data)
+    response = save_file(omiepmd_df)
+    return response
 
-    if omiepmd_df is not None:
-        #create_csv_inlocal(omiepmd_df,"C:/Users/hp/Documents/Óscar","precios_omiepmd.csv")
-        #csv_buffer = create_csv_inbuffer(omiepmd_df)
-        return omiepmd_df
-        print("File 'prices_omiepmd.csv' created.")
-
-# Process data in a DataFrame
-def process_data(data):
+def pmd_process_data(data):
     if data:
         try:
             # Mapping geo_id to country name
@@ -88,4 +105,50 @@ def process_data(data):
             print(f"Error processing data: {e}")
             return None
     else:
+        return None
+    
+def save_file(omiepmd_df):
+    response = False
+    
+    csv_file_path = os.path.join(os.getcwd(), 'data', 'pricesBDD.csv')
+
+    # Si el archivo existe, cargar los datos y hacer merge
+    if os.path.exists(csv_file_path):
+        existing_df = pd.read_csv(csv_file_path)
+        
+        # Unir los datos existentes con el nuevo DataFrame
+        merged_df = pd.concat([existing_df, omiepmd_df], ignore_index=True)
+        
+        # Eliminar duplicados basándose en todas las columnas (o puedes especificar columnas clave)
+        merged_df.drop_duplicates(inplace=True)
+        
+        # Guardar el DataFrame actualizado
+        merged_df.to_csv(csv_file_path, index=False, encoding='utf-8')
+        
+        print(f"Datos actualizados y guardados en: {csv_file_path}")
+    else:
+        # Si no existe el archivo, guardar directamente el DataFrame recibido
+        omiepmd_df.to_csv(csv_file_path, index=False, encoding='utf-8')
+        
+        print(f"Nuevo archivo guardado en: {csv_file_path}")
+
+    response = True
+    
+    return response
+
+def return_price(start_date, end_date):
+
+    csv_file_path = os.path.join(os.getcwd(), 'data', 'pricesBDD.csv')
+    
+    # Verificar si el archivo existe
+    if os.path.exists(csv_file_path):
+        # Leer el CSV en un DataFrame
+        df = pd.read_csv(csv_file_path, parse_dates=['Fecha'])  # Asume que tienes una columna 'Fecha'
+
+        # Filtrar por rango de fechas
+        df_filtered = df[(df['Fecha'] >= start_date) & (df['Fecha'] <= end_date)]
+        
+        return df_filtered
+    else:
+        print("El archivo no existe.")
         return None
