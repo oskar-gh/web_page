@@ -10,15 +10,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from datetime import datetime, timedelta
 from .ree_request import get_data_from_api
 
+csv_file_path = os.path.join(os.getcwd(), 'data', 'pricesBDD.csv')
 
 def update_ree():
     ####
     #time = datetime.now()
     #print(f"Comienzo: {time}")
     ####
-    csv_file_path = os.path.join(os.getcwd(), 'data', 'pricesBDD.csv')
-    
-    print(csv_file_path)
     
     # Verificar si el archivo existe
     if os.path.exists(csv_file_path):
@@ -28,14 +26,28 @@ def update_ree():
     else:
         # Restar dos años a la fecha actual y fijarla al 1 de enero
         max_date = datetime(datetime.now().year - 2, 1, 1)
-        
-    last_day_of_month = calendar.monthrange(max_date.year, max_date.month)[1]
+    
+    #At the maximum ecfah, the request can be made for a maximum of 180 days.
+    # Subsequently, if more is needed, the user must make a request again for 6 more months.
     start_date = max_date.date()
-    end_date = datetime(start_date.year, start_date.month, last_day_of_month).date()
+    end_date = start_date + timedelta(days=180)
+    last_day_of_month = calendar.monthrange(end_date.year, end_date.month)[1]
+    end_date = datetime(end_date.year, end_date.month, last_day_of_month).date()
 
+    if end_date >= datetime.now().date():
+        if datetime.now().hour >=15:
+            end_date = datetime.now().date() + timedelta(days=1)
+        else:
+            end_date = datetime.now().date()
+                
     #print(f"Comienzo: {start_date}")
     #print(f"Fin: {end_date}")
-        
+    
+    if start_date > end_date:
+        print("No hay datos nuevos")
+        return False
+
+
     # URL for daily market price indicator (OMIE_PMD - indicator 600)
     omiepmd_url = f"https://api.esios.ree.es/indicators/600?start_date={start_date}T00:00&end_date={end_date}T23:59"
 
@@ -109,8 +121,6 @@ def pmd_process_data(data):
     
 def save_file(omiepmd_df):
     response = False
-    
-    csv_file_path = os.path.join(os.getcwd(), 'data', 'pricesBDD.csv')
 
     # Si el archivo existe, cargar los datos y hacer merge
     if os.path.exists(csv_file_path):
@@ -119,6 +129,8 @@ def save_file(omiepmd_df):
         # Unir los datos existentes con el nuevo DataFrame
         merged_df = pd.concat([existing_df, omiepmd_df], ignore_index=True)
         
+        #print("DataFrame inicial:", merged_df.head(25))
+        #print("DataFrame inicial:", merged_df.info())
         # Eliminar duplicados basándose en todas las columnas (o puedes especificar columnas clave)
         merged_df.drop_duplicates(inplace=True)
         
@@ -137,8 +149,6 @@ def save_file(omiepmd_df):
     return response
 
 def return_price(start_date, end_date):
-
-    csv_file_path = os.path.join(os.getcwd(), 'data', 'pricesBDD.csv')
     
     # Verificar si el archivo existe
     if os.path.exists(csv_file_path):
@@ -152,3 +162,22 @@ def return_price(start_date, end_date):
     else:
         print("El archivo no existe.")
         return None
+
+def return_price_minandmax():
+    
+    if os.path.exists(csv_file_path):
+        # Leer el CSV en un DataFrame
+        df = pd.read_csv(csv_file_path, parse_dates=['Fecha'])  # Asume que tienes una columna 'Fecha'
+
+        min_date = df['Fecha'].min()
+        max_date = df['Fecha'].max()
+        num_distinct_days = df['Fecha'].nunique()
+        num_total_days = (max_date - min_date).days + 1
+        label_text = f"Datos entre {min_date.strftime('%d/%m/%Y')} y {max_date.strftime('%d/%m/%Y')}"
+        if num_total_days > num_distinct_days:
+            label_text = f"{label_text}. Existen huecos por medio"
+
+    else:
+        label_text = "El archivo no existe."
+    
+    return label_text

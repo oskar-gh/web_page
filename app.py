@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, jsonify
 from electrical_market import pmd_download
 import os
 
@@ -40,7 +40,7 @@ def electrical_market_index():
     
     #time = datetime.now()
     #print(f"Consulta iniciada a las: {time}")
-    if request.method == 'GET':
+    if request.method == 'GET':        
         # Get tomorrow's date
         if datetime.now().hour >= 15:
             start_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
@@ -52,7 +52,8 @@ def electrical_market_index():
         end_date = request.form.get('end_date')
         
     df_all = pmd_download.return_price(start_date, end_date)
-        
+    label_text = pmd_download.return_price_minandmax()
+
     #save csv to future downloads
     csv_file_path = os.path.join('data', 'prices.csv')
     df_all.to_csv(csv_file_path, index=False)
@@ -63,12 +64,20 @@ def electrical_market_index():
     
     # Convertir a listas para el gráfico solo  España
     spain_dates = df_spain.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()
+    format_dates = []
+    for date_str in spain_dates:
+        # format date XX/XX/XXXX 0:00:00 1, for a date without hours
+        format_dates.append(f"{datetime.strptime(date_str.split()[0], '%Y-%m-%d').strftime('%d/%m/%Y')} {date_str.split()[2]}")
+    spain_dates = format_dates
+    all_dates = spain_dates
+    
     spain_prices_data = df_spain['España'].tolist() 
-    all_dates = df_spain.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()
     all_prices_data = {country: df_all[country].tolist() for country in df_all.columns if country not in ['Fecha', 'Hora', 'Horario']}
+    
     
     # Renderizar la plantilla con los dos DataFrames y datos para el gráfico
     return render_template('electrical_market_index.html', 
+                        label_text=label_text,
                         all_prices=df_all.to_html(classes='data'), 
                         spain_prices=df_spain.to_html(classes='data'), 
                         spain_dates=spain_dates, 
@@ -88,9 +97,9 @@ def updateRee():
     #time = datetime.now()
     #print(f"Consulta iniciada a las: {time}")
     response = pmd_download.update_ree()
-    return "", 204  # Código 204 No Content para indicar que la solicitud se procesó correctamente sin contenido
-    
-    
+    new_label_text = pmd_download.return_price_minandmax()
+    return jsonify({'label_text': new_label_text})
+    #return "", 204  # Código 204 No Content para indicar que la solicitud se procesó correctamente sin contenido
 
     
 

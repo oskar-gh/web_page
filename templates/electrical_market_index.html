@@ -108,6 +108,12 @@
             height: 200px;
         }
 
+        .flex-container {
+            display: flex;
+            align-items: center; /* Alineación vertical */
+            margin-bottom: 10px; /* Espacio debajo del contenedor */
+        }
+        
     </style>
 </head>
 <body>
@@ -117,9 +123,15 @@
     <a href="/" class="home-button" title="Volver a la página principal">
         <img src="{{ url_for('static', filename='complements/compass.png') }}" alt="Inicio">
     </a>
+    
 
     <!-- Formulario para elegir rango de fechas -->
     <form action="/electrical_market_index" method="POST">
+        <div class="flex-container">
+            <p id="dynamic-label">{{ label_text }}</p>
+            <button type="button" id="updateRee">Actualizar datos de REE</button>
+        </div>
+
         <label for="start_date">Fecha de inicio:</label>
         <input type="date" id="start_date" name="start_date" required value="{{ start_date }}">
         
@@ -128,7 +140,6 @@
         
         <button type="submit">Consultar precios</button>
         <button type="button" id="downloadCsv">Descargar CSV</button> 
-        <button type="button" id="updateRee">Actualizar datos de REE</button> 
     </form>
 
     <div id="spinner" style="display:none;">
@@ -309,33 +320,40 @@
         // Evento para actualizar datos de REE
         document.getElementById("updateRee").addEventListener("click", function() {
             document.getElementById('spinner').style.display = 'block'; // Mostrar el spinner
+        
+            // Bloquear los botones
+            document.querySelectorAll('button').forEach(button => {
+                button.disabled = true;
+            });
+        
             $.ajax({
                 url: '/updateRee', // URL de la ruta de Flask
                 type: 'GET',
+                success: function(response) {
+                    // Actualizar el label con el nuevo texto recibido
+                    document.getElementById('dynamic-label').innerText = response.label_text;
+                },
                 error: function(xhr, status, error) {
                     console.error('Error en la actualización:', error); // Maneja errores
                 },
                 complete: function() {
                     console.log('Actualización completada'); // Maneja la respuesta si es necesario
                     document.getElementById('spinner').style.display = 'none'; // Ocultar el spinner
+        
+                    // Desbloquear los botones
+                    document.querySelectorAll('button').forEach(button => {
+                        button.disabled = false;
+                    });
                 }
             });
         });
 
         document.querySelector('form').addEventListener('submit', function() {
             document.getElementById('spinner').style.display = 'block';
-            //const startTime = Date.now();
-            //console.log("Termina: " + new Date(startTime).toLocaleTimeString());
+            const startTime = Date.now();
+            console.log("SUBMIT: " + new Date(startTime).toLocaleTimeString());
         });
         
-        //window.addEventListener('load', function() {
-            //const endTime = Date.now();
-            //console.log("Respuesta recibida del servidor a las: " + new Date(endTime).toLocaleTimeString());
-
-        
-            //// Ocultar el spinner al recibir la respuesta
-            //document.getElementById('spinner').style.display = 'none';
-        //});
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
