@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from datetime import datetime, timedelta
 from .ree_request import get_data_from_api
 
-csv_file_path = os.path.join(os.getcwd(), 'data', 'BDD_electricalmarket_PMD.csv')
+csv_file_path = os.path.join(os.getcwd(), 'data', 'BDD_electricalmarket_PVPC.csv')
 
 def update_ree():
     ####
@@ -30,7 +30,7 @@ def update_ree():
     #At the maximum ecfah, the request can be made for a maximum of 180 days.
     # Subsequently, if more is needed, the user must make a request again for 6 more months.
     start_date = max_date.date()
-    end_date = start_date + timedelta(days=180)
+    end_date = start_date + timedelta(days=1)
     last_day_of_month = calendar.monthrange(end_date.year, end_date.month)[1]
     end_date = datetime(end_date.year, end_date.month, last_day_of_month).date()
 
@@ -40,21 +40,19 @@ def update_ree():
         else:
             end_date = datetime.now().date()
                 
-    #print(f"Comienzo: {start_date}")
-    #print(f"Fin: {end_date}")
+    print(f"Comienzo: {start_date}")
+    print(f"Fin: {end_date}")
     
     if start_date > end_date:
         print("No hay datos nuevos")
         return False
 
-
-    # URL for daily market price indicator (OMIE_PMD - indicator 600)
-    omiepmd_url = f"https://api.esios.ree.es/indicators/600?start_date={start_date}T00:00&end_date={end_date}T23:59"
-
+    # URL for daily market price indicator (PVPC - indicator 10229 )
+    pvpc_url = f"https://api.esios.ree.es/indicators/10391?start_date={start_date}T00:00&end_date={end_date}T23:59"
     # Obtain and process daily market data
-    omiepmd_data = get_data_from_api(omiepmd_url)
-    omiepmd_df = process_data(omiepmd_data)
-    response = save_file(omiepmd_df)
+    pvpc_data = get_data_from_api(pvpc_url)
+    pvpc_df = process_data(pvpc_data)
+    response = save_file(pvpc_df)
     return response
 
 def process_data(data):
@@ -62,45 +60,43 @@ def process_data(data):
         try:
             # Mapping geo_id to country name
             geo_mapping = {
-                1: "Portugal",
-                2: "Francia",
-                3: "España",
-                8824: "Reino Unido",
-                8825: "Italia",
-                8826: "Alemania",
-                8827: "Bélgica",
-                8828: "Países Bajos"
+                8741: "Península",
+                8742: "Canarias",
+                8743: "Baleares",
+                8744: "Ceuta",
+                8745: "Melilla"
             }
 
             values = data['indicator']['values'] if 'indicator' in data and 'values' in data['indicator'] else data
             df = pd.DataFrame(values)
             
             # Print the DataFrame for debugging
-            #print("DataFrame inicial:", df.head(300))
+            print("DataFrame inicial:", df.head(300))
             #print("Información del DataFrame:", df.info())
 
             # Add country column
             if 'geo_id' in df.columns and 'datetime' in df.columns and 'value' in df.columns:
+                print("1")
+                print((df['datetime_utc']).dt.tz_convert('Europe/Madrid'))
                 df['datetime'] = pd.to_datetime(df['datetime_utc']).dt.tz_convert('Europe/Madrid')
                 df['Fecha'] = df['datetime'].dt.date
                 df['Hora'] = df['datetime'].dt.hour + 1
                 df['Horario'] = df['datetime'].apply(lambda x: 'Verano' if x.dst() != pd.Timedelta(0) else 'Invierno')
                 df['Horario_orden'] = df['datetime'].apply(lambda x: 0 if x.dst() != pd.Timedelta(0) else 1).astype(int)
                 df['Precio'] = df['value'].astype(float)
-                df['País'] = df['geo_id'].map(geo_mapping)
+                df['Sistema'] = df['geo_id'].map(geo_mapping)
 
                 #df_sorted = df.sort_values(by=['Fecha', 'Hora', 'Horario_orden'])
-                
+            
                 # Pivot the DataFrame
-                df_pivot = df.pivot_table(index=['Fecha', 'Hora', 'Horario_orden', 'Horario'], columns='País', values='Precio', aggfunc='first')
+                df_pivot = df.pivot_table(index=['Fecha', 'Hora', 'Horario_orden', 'Horario'], columns='Sistema', values='Precio', aggfunc='first')
                 
                 #print("DataFrame inicial:", df_pivot.head(300))
                 
-                
                 # Reorder the columns, ensuring that 'Spain' is the first
-                if 'España' in df_pivot.columns:
+                if 'Península' in df_pivot.columns:
                     # Replace 'Spain' in first position
-                    cols = ['España'] + [col for col in df_pivot.columns if col != 'España']
+                    cols = ['Península'] + [col for col in df_pivot.columns if col != 'Península']
                     df_pivot = df_pivot[cols]
 
                 
@@ -119,7 +115,7 @@ def process_data(data):
     else:
         return None
     
-def save_file(omiepmd_df):
+def save_file(pvpc_df):
     response = False
 
     # Si el archivo existe, cargar los datos y hacer merge
@@ -127,7 +123,7 @@ def save_file(omiepmd_df):
         existing_df = pd.read_csv(csv_file_path)
         
         # Unir los datos existentes con el nuevo DataFrame
-        merged_df = pd.concat([existing_df, omiepmd_df], ignore_index=True)
+        merged_df = pd.concat([existing_df, pvpc_df], ignore_index=True)
         
         #print("DataFrame inicial:", merged_df.head(25))
         #print("DataFrame inicial:", merged_df.info())
@@ -140,7 +136,7 @@ def save_file(omiepmd_df):
         print(f"Datos actualizados y guardados en: {csv_file_path}")
     else:
         # Si no existe el archivo, guardar directamente el DataFrame recibido
-        omiepmd_df.to_csv(csv_file_path, index=False, encoding='utf-8')
+        pvpc_df.to_csv(csv_file_path, index=False, encoding='utf-8')
         
         print(f"Nuevo archivo guardado en: {csv_file_path}")
 
@@ -173,10 +169,9 @@ def return_price_minandmax():
         max_date = df['Fecha'].max()
         num_distinct_days = df['Fecha'].nunique()
         num_total_days = (max_date - min_date).days + 1
-        label_text = f"PMD {min_date.strftime('%d/%m/%Y')}-{max_date.strftime('%d/%m/%Y')}"
+        label_text = f"PVPC {min_date.strftime('%d/%m/%Y')}-{max_date.strftime('%d/%m/%Y')}"
         if num_total_days > num_distinct_days:
             label_text = f"{label_text}. Con huecos"
-
     else:
         label_text = "El archivo no existe."
     

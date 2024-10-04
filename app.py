@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, send_file, jsonify
-from electrical_market import pmd_download
+from electrical_market import pmd_download, pvpc_download
 import os
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
@@ -55,7 +55,7 @@ def electrical_market_index():
     label_text = pmd_download.return_price_minandmax()
 
     #save csv to future downloads
-    csv_file_path = os.path.join('data', 'prices.csv')
+    csv_file_path = os.path.join('data', 'download.csv')
     df_all.to_csv(csv_file_path, index=False)
     #print("DataFrame inicial:", df_all.head(30))
     
@@ -89,7 +89,7 @@ def electrical_market_index():
 
 @app.route('/download_csv')
 def download_csv():
-    csv_file_path = os.path.join(os.getcwd(), 'data', 'prices.csv')
+    csv_file_path = os.path.join(os.getcwd(), 'data', 'download.csv')
     return send_file(csv_file_path, as_attachment=True)
 
 @app.route('/updateRee')
@@ -97,7 +97,9 @@ def updateRee():
     #time = datetime.now()
     #print(f"Consulta iniciada a las: {time}")
     response = pmd_download.update_ree()
+    response = pvpc_download.update_ree()
     new_label_text = pmd_download.return_price_minandmax()
+    new_label_text = "-->" + new_label_text + " --- " + pvpc_download.return_price_minandmax() + "<--"
     return jsonify({'label_text': new_label_text})
     #return "", 204  # Código 204 No Content para indicar que la solicitud se procesó correctamente sin contenido
 
