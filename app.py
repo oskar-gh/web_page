@@ -53,7 +53,10 @@ def electrical_market_index():
         
     df_all = pmd_download.return_price(start_date, end_date)
     label_text = pmd_download.return_price_minandmax()
+    label_text = "-->" + label_text + " --- " + pvpc_download.return_price_minandmax() + "<--"
 
+    #TODO --> Controlar si no existen ficheros
+    
     #save csv to future downloads
     csv_file_path = os.path.join('data', 'download.csv')
     df_all.to_csv(csv_file_path, index=False)

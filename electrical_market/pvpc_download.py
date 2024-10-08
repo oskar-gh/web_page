@@ -30,7 +30,7 @@ def update_ree():
     #At the maximum ecfah, the request can be made for a maximum of 180 days.
     # Subsequently, if more is needed, the user must make a request again for 6 more months.
     start_date = max_date.date()
-    end_date = start_date + timedelta(days=1)
+    end_date = start_date + timedelta(days=180)
     last_day_of_month = calendar.monthrange(end_date.year, end_date.month)[1]
     end_date = datetime(end_date.year, end_date.month, last_day_of_month).date()
 
@@ -39,16 +39,16 @@ def update_ree():
             end_date = datetime.now().date() + timedelta(days=1)
         else:
             end_date = datetime.now().date()
-                
-    print(f"Comienzo: {start_date}")
-    print(f"Fin: {end_date}")
+    
+    #print(f"Comienzo: {start_date}")
+    #print(f"Fin: {end_date}")
     
     if start_date > end_date:
         print("No hay datos nuevos")
         return False
 
-    # URL for daily market price indicator (PVPC - indicator 10229 )
-    pvpc_url = f"https://api.esios.ree.es/indicators/10391?start_date={start_date}T00:00&end_date={end_date}T23:59"
+    # URL for daily market price indicator (PVPC - indicator 10391 - 8741 geo_id PENINSULA)
+    pvpc_url = f"https://api.esios.ree.es/indicators/10391?start_date={start_date}T00:00&end_date={end_date}T23:59&geo_ids[]=8741"
     # Obtain and process daily market data
     pvpc_data = get_data_from_api(pvpc_url)
     pvpc_df = process_data(pvpc_data)
@@ -60,7 +60,7 @@ def process_data(data):
         try:
             # Mapping geo_id to country name
             geo_mapping = {
-                8741: "Península",
+                8741: "Península", #Only extract Península from URL
                 8742: "Canarias",
                 8743: "Baleares",
                 8744: "Ceuta",
@@ -71,13 +71,12 @@ def process_data(data):
             df = pd.DataFrame(values)
             
             # Print the DataFrame for debugging
-            print("DataFrame inicial:", df.head(300))
+            #print("DataFrame inicial:", df.head(300))
+            #print(df.iloc[:300].to_string())
             #print("Información del DataFrame:", df.info())
 
             # Add country column
             if 'geo_id' in df.columns and 'datetime' in df.columns and 'value' in df.columns:
-                print("1")
-                print((df['datetime_utc']).dt.tz_convert('Europe/Madrid'))
                 df['datetime'] = pd.to_datetime(df['datetime_utc']).dt.tz_convert('Europe/Madrid')
                 df['Fecha'] = df['datetime'].dt.date
                 df['Hora'] = df['datetime'].dt.hour + 1
@@ -85,20 +84,12 @@ def process_data(data):
                 df['Horario_orden'] = df['datetime'].apply(lambda x: 0 if x.dst() != pd.Timedelta(0) else 1).astype(int)
                 df['Precio'] = df['value'].astype(float)
                 df['Sistema'] = df['geo_id'].map(geo_mapping)
-
-                #df_sorted = df.sort_values(by=['Fecha', 'Hora', 'Horario_orden'])
             
                 # Pivot the DataFrame
                 df_pivot = df.pivot_table(index=['Fecha', 'Hora', 'Horario_orden', 'Horario'], columns='Sistema', values='Precio', aggfunc='first')
                 
                 #print("DataFrame inicial:", df_pivot.head(300))
                 
-                # Reorder the columns, ensuring that 'Spain' is the first
-                if 'Península' in df_pivot.columns:
-                    # Replace 'Spain' in first position
-                    cols = ['Península'] + [col for col in df_pivot.columns if col != 'Península']
-                    df_pivot = df_pivot[cols]
-
                 
                 df_pivot.reset_index(inplace=True)
                 df_pivot.index = df_pivot.index + 1
@@ -163,7 +154,7 @@ def return_price_minandmax():
     
     if os.path.exists(csv_file_path):
         # Leer el CSV en un DataFrame
-        df = pd.read_csv(csv_file_path, parse_dates=['Fecha'])  # Asume que tienes una columna 'Fecha'
+        df = pd.read_csv(csv_file_path, parse_dates=['Fecha']) 
 
         min_date = df['Fecha'].min()
         max_date = df['Fecha'].max()
