@@ -51,7 +51,8 @@ def electrical_market_index():
         start_date = request.form.get('start_date')
         end_date = request.form.get('end_date')
         
-    df_all = pmd_download.return_price(start_date, end_date)
+    df_all = pmd_download.return_price(start_date, end_date, False)
+    df_spain = pmd_download.return_price(start_date, end_date, True)
     label_text = pmd_download.return_price_minandmax()
     label_text = "-->" + label_text + " --- " + pvpc_download.return_price_minandmax() + "<--"
 
@@ -62,21 +63,21 @@ def electrical_market_index():
     df_all.to_csv(csv_file_path, index=False)
     #print("DataFrame inicial:", df_all.head(30))
     
-    # Seleccionar solo los precios de España
-    df_spain = df_all[['Fecha', 'Hora', 'Horario', 'España']] 
-    
-    # Convertir a listas para el gráfico solo  España
+    # Convert to lists for the chart
     spain_dates = df_spain.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()
     format_dates = []
     for date_str in spain_dates:
         # format date XX/XX/XXXX 0:00:00 1, for a date without hours
         format_dates.append(f"{datetime.strptime(date_str.split()[0], '%Y-%m-%d').strftime('%d/%m/%Y')} {date_str.split()[2]}")
     spain_dates = format_dates
+    #The chart format is the same for all prices
     all_dates = spain_dates
     
-    spain_prices_data = df_spain['España'].tolist() 
+    #spain_prices_data = df_spain['PMD'].tolist() 
+    spain_prices_data = {type_price: df_spain[type_price].tolist() for type_price in df_spain.columns if type_price not in ['Fecha', 'Hora', 'Horario']}
     all_prices_data = {country: df_all[country].tolist() for country in df_all.columns if country not in ['Fecha', 'Hora', 'Horario']}
-    
+    print(spain_prices_data)
+    print(all_prices_data)
     
     # Renderizar la plantilla con los dos DataFrames y datos para el gráfico
     return render_template('electrical_market_index.html', 

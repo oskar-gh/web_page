@@ -213,31 +213,48 @@
             const ctx = document.getElementById('spainPricesChart').getContext('2d');
 
             // Si ya existe un gráfico, destrúyelo antes de crear uno nuevo
-            if (spainPricesChart) {
-                spainPricesChart.destroy();
+            if (allPricesChart) {
+                allPricesChart.destroy();
             }
-            
-            spainPricesChart = new Chart(ctx, {
+
+            // Only generate the chart if it hasn't been created yet
+            allPricesChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: {{ spain_dates|tojson }},  // Replace with your backend data
-                    datasets: [{
-                        label: 'Precios España',
-                        data: {{ spain_prices_data|tojson }},  // Replace with your backend data
-                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                        borderColor: 'rgba(255, 206, 86, 1)',
-                        borderWidth: 1
-                    }]
+                    datasets: [
+                        {% for price_type, prices in spain_prices_data.items() %}
+                        {
+                            label: '{{ price_type }}',  // Nombre del país
+                            data: {{ prices|tojson }},  // Precios de ese país
+                            fill: false,
+                            backgroundColor: getRandomColor(),  // Asignar un color aleatorio para cada país
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            borderWidth: 1,
+                            hidden: {% if price_type in ['PMD'] %} false {% else %} true {% endif %}
+                        },
+                        {% endfor %}
+                    ]
                 },
                 options: {
                     responsive: true,  // Asegúrate de que el gráfico sea responsivo
                     maintainAspectRatio: false, // Mantiene la relación de aspecto
                     scales: {
                         x: {
-                            beginAtZero: true
+                            beginAtZero: false,
                         },
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Precios'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,  // Mostrar leyenda
+                            position: 'top'
                         }
                     }
                 }

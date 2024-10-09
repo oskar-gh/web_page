@@ -148,17 +148,21 @@ def save_file(omiepmd_df):
     
     return response
 
-def return_price(start_date, end_date):
+def return_price(start_date, end_date, only_spain):
     
-    # Verificar si el archivo existe
+    # Check if the file exists
     if os.path.exists(csv_file_path):
-        # Leer el CSV en un DataFrame
-        df = pd.read_csv(csv_file_path, parse_dates=['Fecha'])  # Asume que tienes una columna 'Fecha'
-
-        # Filtrar por rango de fechas
-        df_filtered = df[(df['Fecha'] >= start_date) & (df['Fecha'] <= end_date)]
-        
-        return df_filtered
+        # Read the CSV into a DataFrame
+        df = pd.read_csv(csv_file_path, parse_dates=['Fecha'])
+        if not df.empty:
+            if only_spain:
+                df = df[['Fecha', 'Hora', 'Horario', 'España']].rename(columns={'España': 'PMD'})
+                
+            df_filtered = df[(df['Fecha'] >= start_date) & (df['Fecha'] <= end_date)]
+            return df_filtered
+        else:
+            print("El archivo no existe.")
+            return None
     else:
         print("El archivo no existe.")
         return None
