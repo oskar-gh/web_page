@@ -24,14 +24,14 @@
         }
 
         /* Style for first 3 columns in gray */
-        td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(4),
-        th:nth-child(1), th:nth-child(2), th:nth-child(3), td:nth-child(4) {
+        td:nth-child(1), td:nth-child(2), td:nth-child(3),
+        th:nth-child(1), th:nth-child(2), th:nth-child(3) {
             background-color: #d3d3d3; /* Gris */
         }
 
         /* Style for Spain column in light yellow */
-        td:nth-child(5),
-        th:nth-child(5) {
+        td:nth-child(4),
+        th:nth-child(4) {
             background-color: #ffffcc; /* Amarillo claro */
         }
 
@@ -148,18 +148,8 @@
 
     <!-- Tabs for DataFrames and Spain Chart -->
     <div class="tab">
-        <button class="tablinks" onclick="openTab(event, 'AllPrices')">Precios Europa</button>
         <button class="tablinks" onclick="openTab(event, 'SpainPrices')">Precios España</button>
-    </div>
-
-    <!-- Tab content for all prices -->
-    <div id="AllPrices" class="tab-content active">
-        <div class="chart-container">
-            <canvas id="allPricesChart" style="width: 100%; height: 300px;"></canvas>
-        </div>
-        <div class="table-container">
-            {{ all_prices|safe }}
-        </div>
+        <button class="tablinks" onclick="openTab(event, 'AllPrices')">Precios Europa</button>
     </div>
 
     <!-- Tab content for Spain prices and chart -->
@@ -167,15 +157,27 @@
         <div class="chart-container">
             <canvas id="spainPricesChart" style="width: 100%; height: 300px;"></canvas>
         </div>
+        <p id="dynamic-label">{{ register_counter_spainprices }}</p>
         <div class="table-container">
             {{ spain_prices|safe }}
         </div>
     </div>
 
+    <!-- Tab content for all prices -->
+    <div id="AllPrices" class="tab-content active">
+        <div class="chart-container">
+            <canvas id="allPricesChart" style="width: 100%; height: 300px;"></canvas>
+        </div>
+        <p id="dynamic-label">{{ register_counter_allprices }}</p>
+        <div class="table-container">
+            {{ all_prices|safe }}
+        </div>
+    </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        let allPricesChart;
         let spainPricesChart;
+        let allPricesChart;
 
         // Function to open tabs
         function openTab(evt, tabName) {
@@ -213,31 +215,48 @@
             const ctx = document.getElementById('spainPricesChart').getContext('2d');
 
             // Si ya existe un gráfico, destrúyelo antes de crear uno nuevo
-            if (spainPricesChart) {
-                spainPricesChart.destroy();
+            if (allPricesChart) {
+                allPricesChart.destroy();
             }
-            
-            spainPricesChart = new Chart(ctx, {
+
+            // Only generate the chart if it hasn't been created yet
+            allPricesChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: {{ spain_dates|tojson }},  // Replace with your backend data
-                    datasets: [{
-                        label: 'Precios España',
-                        data: {{ spain_prices_data|tojson }},  // Replace with your backend data
-                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                        borderColor: 'rgba(255, 206, 86, 1)',
-                        borderWidth: 1
-                    }]
+                    datasets: [
+                        {% for price_type, prices in spain_prices_data.items() %}
+                        {
+                            label: '{{ price_type }}',  // Nombre del país
+                            data: {{ prices|tojson }},  // Precios de ese país
+                            fill: false,
+                            backgroundColor: getRandomColor(),  // Asignar un color aleatorio para cada país
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            borderWidth: 1,
+                            hidden: {% if price_type in ['PMD'] %} false {% else %} true {% endif %}
+                        },
+                        {% endfor %}
+                    ]
                 },
                 options: {
                     responsive: true,  // Asegúrate de que el gráfico sea responsivo
                     maintainAspectRatio: false, // Mantiene la relación de aspecto
                     scales: {
                         x: {
-                            beginAtZero: true
+                            beginAtZero: false,
                         },
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Precios'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,  // Mostrar leyenda
+                            position: 'top'
                         }
                     }
                 }
@@ -354,6 +373,10 @@
             console.log("SUBMIT: " + new Date(startTime).toLocaleTimeString());
         });
         
+        document.addEventListener("DOMContentLoaded", function() {
+            // Simular clic en el botón "Precios España"
+            document.querySelector('.tablinks').click(); // Esto simula el clic en el primer botón
+        });
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

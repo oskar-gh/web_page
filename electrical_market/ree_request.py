@@ -1,5 +1,8 @@
 import requests
 
+#https://api.esios.ree.es/
+#https://www.ree.es/es/apidatos
+
 # Function connection to  API
 def get_data_from_api(url):
     
