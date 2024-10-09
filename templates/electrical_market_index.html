@@ -371,6 +371,10 @@
             console.log("SUBMIT: " + new Date(startTime).toLocaleTimeString());
         });
         
+        document.addEventListener("DOMContentLoaded", function() {
+            // Simular clic en el botón "Precios España"
+            document.querySelector('.tablinks').click(); // Esto simula el clic en el primer botón
+        });
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
