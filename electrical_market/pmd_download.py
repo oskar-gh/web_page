@@ -105,8 +105,6 @@ def process_data(data):
 
                 
                 df_pivot.reset_index(inplace=True)
-                df_pivot.index = df_pivot.index + 1
-                df_pivot.columns.name = "Contador Registros"
                 df_pivot = df_pivot.drop(columns=['Horario_orden'])
 
                 return df_pivot
@@ -154,10 +152,12 @@ def return_price(start_date, end_date, only_spain):
     if os.path.exists(csv_file_path):
         # Read the CSV into a DataFrame
         df = pd.read_csv(csv_file_path, parse_dates=['Fecha'])
+        #print("DataFrame inicial:", df.head(300))
+        #print("Información del DataFrame:", df.info())
+
         if not df.empty:
             if only_spain:
                 df = df[['Fecha', 'Hora', 'Horario', 'España']].rename(columns={'España': 'PMD'})
-                
             df_filtered = df[(df['Fecha'] >= start_date) & (df['Fecha'] <= end_date)]
             return df_filtered
         else:

@@ -50,9 +50,10 @@ def electrical_market_index():
     else:
         start_date = request.form.get('start_date')
         end_date = request.form.get('end_date')
-        
-    df_all = pmd_download.return_price(start_date, end_date, False)
+    
+
     df_spain = pmd_download.return_price(start_date, end_date, True)
+    df_all = pmd_download.return_price(start_date, end_date, False)
     label_text = pmd_download.return_price_minandmax()
     label_text = "-->" + label_text + " --- " + pvpc_download.return_price_minandmax() + "<--"
 
@@ -76,14 +77,12 @@ def electrical_market_index():
     #spain_prices_data = df_spain['PMD'].tolist() 
     spain_prices_data = {type_price: df_spain[type_price].tolist() for type_price in df_spain.columns if type_price not in ['Fecha', 'Hora', 'Horario']}
     all_prices_data = {country: df_all[country].tolist() for country in df_all.columns if country not in ['Fecha', 'Hora', 'Horario']}
-    print(spain_prices_data)
-    print(all_prices_data)
-    
+       
     # Renderizar la plantilla con los dos DataFrames y datos para el gráfico
     return render_template('electrical_market_index.html', 
                         label_text=label_text,
-                        all_prices=df_all.to_html(classes='data'), 
                         spain_prices=df_spain.to_html(classes='data'), 
+                        all_prices=df_all.to_html(classes='data'), 
                         spain_dates=spain_dates, 
                         spain_prices_data=spain_prices_data,
                         all_dates=all_dates, 

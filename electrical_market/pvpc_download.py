@@ -90,10 +90,7 @@ def process_data(data):
                 
                 #print("DataFrame inicial:", df_pivot.head(300))
                 
-                
                 df_pivot.reset_index(inplace=True)
-                df_pivot.index = df_pivot.index + 1
-                df_pivot.columns.name = "Contador Registros"
                 df_pivot = df_pivot.drop(columns=['Horario_orden'])
 
                 return df_pivot

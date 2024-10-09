@@ -148,18 +148,8 @@
 
     <!-- Tabs for DataFrames and Spain Chart -->
     <div class="tab">
-        <button class="tablinks" onclick="openTab(event, 'AllPrices')">Precios Europa</button>
         <button class="tablinks" onclick="openTab(event, 'SpainPrices')">Precios España</button>
-    </div>
-
-    <!-- Tab content for all prices -->
-    <div id="AllPrices" class="tab-content active">
-        <div class="chart-container">
-            <canvas id="allPricesChart" style="width: 100%; height: 300px;"></canvas>
-        </div>
-        <div class="table-container">
-            {{ all_prices|safe }}
-        </div>
+        <button class="tablinks" onclick="openTab(event, 'AllPrices')">Precios Europa</button>
     </div>
 
     <!-- Tab content for Spain prices and chart -->
@@ -172,10 +162,20 @@
         </div>
     </div>
 
+    <!-- Tab content for all prices -->
+    <div id="AllPrices" class="tab-content active">
+        <div class="chart-container">
+            <canvas id="allPricesChart" style="width: 100%; height: 300px;"></canvas>
+        </div>
+        <div class="table-container">
+            {{ all_prices|safe }}
+        </div>
+    </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        let allPricesChart;
         let spainPricesChart;
+        let allPricesChart;
 
         // Function to open tabs
         function openTab(evt, tabName) {
