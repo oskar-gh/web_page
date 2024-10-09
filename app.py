@@ -81,8 +81,10 @@ def electrical_market_index():
     # Renderizar la plantilla con los dos DataFrames y datos para el gráfico
     return render_template('electrical_market_index.html', 
                         label_text=label_text,
-                        spain_prices=df_spain.to_html(classes='data'), 
-                        all_prices=df_all.to_html(classes='data'), 
+                        register_counter_spainprices = "NumRegistros: " + str(len(df_spain)),
+                        register_counter_allprices = "NumRegistros: " + str(len(df_all)),
+                        spain_prices=df_spain.to_html(classes='data', index=False), 
+                        all_prices=df_all.to_html(classes='data', index=False), 
                         spain_dates=spain_dates, 
                         spain_prices_data=spain_prices_data,
                         all_dates=all_dates, 
