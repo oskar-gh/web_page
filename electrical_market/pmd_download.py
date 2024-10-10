@@ -22,7 +22,7 @@ def update_ree():
     if os.path.exists(csv_file_path):
         # Leer el CSV en un DataFrame
         df = pd.read_csv(csv_file_path, parse_dates=['Fecha']) 
-        max_date = df['Fecha'].max() + timedelta(days=1)
+        max_date = df['Fecha'].max() - timedelta(days=10)
     else:
         # Restar dos años a la fecha actual y fijarla al 1 de enero
         max_date = datetime(datetime.now().year - 2, 1, 1)
@@ -40,8 +40,8 @@ def update_ree():
         else:
             end_date = datetime.now().date()
                 
-    #print(f"Comienzo: {start_date}")
-    #print(f"Fin: {end_date}")
+    print(f"Comienzo descarga PMD: {start_date}")
+    print(f"Fin descarga PMD: {end_date}")
     
     if start_date > end_date:
         print("No hay datos nuevos")
@@ -51,6 +51,7 @@ def update_ree():
     # URL for daily market price indicator (OMIE_PMD - indicator 600)
     omiepmd_url = f"https://api.esios.ree.es/indicators/600?start_date={start_date}T00:00&end_date={end_date}T23:59"
 
+    print(omiepmd_url)
     # Obtain and process daily market data
     omiepmd_data = get_data_from_api(omiepmd_url)
     omiepmd_df = process_data(omiepmd_data)
@@ -78,7 +79,7 @@ def process_data(data):
             # Print the DataFrame for debugging
             #print("DataFrame inicial:", df.head(300))
             #print("Información del DataFrame:", df.info())
-
+            
             # Add country column
             if 'geo_id' in df.columns and 'datetime' in df.columns and 'value' in df.columns:
                 df['datetime'] = pd.to_datetime(df['datetime_utc']).dt.tz_convert('Europe/Madrid')
@@ -109,7 +110,7 @@ def process_data(data):
 
                 return df_pivot
             else:
-                print("Expected columns not found in data")
+                print("Expected columns not found in data PMD")
                 return None
         except Exception as e:
             print(f"Error processing data: {e}")
@@ -130,7 +131,7 @@ def save_file(omiepmd_df):
         #print("DataFrame inicial:", merged_df.head(25))
         #print("DataFrame inicial:", merged_df.info())
         # Eliminar duplicados basándose en todas las columnas (o puedes especificar columnas clave)
-        merged_df.drop_duplicates(inplace=True)
+        merged_df.drop_duplicates(subset=merged_df.columns[1:], inplace=True)# Excluyendo la primera columna de index
         
         # Guardar el DataFrame actualizado
         merged_df.to_csv(csv_file_path, index=False, encoding='utf-8')
