@@ -11,6 +11,9 @@ from datetime import datetime, timedelta
 from .ree_request import get_data_from_api
 
 csv_file_path = os.path.join(os.getcwd(), 'data', 'BDD_electricalmarket_PMD.csv')
+numdaysreturn = 10
+numdaysfuture = 180
+monthcomplet = True
 
 def update_ree():
     ####
@@ -18,21 +21,20 @@ def update_ree():
     #print(f"Comienzo: {time}")
     ####
     
-    # Verificar si el archivo existe
     if os.path.exists(csv_file_path):
-        # Leer el CSV en un DataFrame
         df = pd.read_csv(csv_file_path, parse_dates=['Fecha']) 
-        max_date = df['Fecha'].max() - timedelta(days=10)
+        if not df.empty:
+            max_date = df['Fecha'].max() - timedelta(days=numdaysreturn)
+        else:
+            max_date = datetime(datetime.now().year - 2, 1, 1)
     else:
-        # Restar dos años a la fecha actual y fijarla al 1 de enero
         max_date = datetime(datetime.now().year - 2, 1, 1)
     
-    #At the maximum ecfah, the request can be made for a maximum of 180 days.
-    # Subsequently, if more is needed, the user must make a request again for 6 more months.
     start_date = max_date.date()
-    end_date = start_date + timedelta(days=180)
-    last_day_of_month = calendar.monthrange(end_date.year, end_date.month)[1]
-    end_date = datetime(end_date.year, end_date.month, last_day_of_month).date()
+    end_date = start_date + timedelta(days=numdaysfuture)
+    if monthcomplet:
+        last_day_of_month = calendar.monthrange(end_date.year, end_date.month)[1]
+        end_date = datetime(end_date.year, end_date.month, last_day_of_month).date()
 
     if end_date >= datetime.now().date():
         if datetime.now().hour >=15:
@@ -118,50 +120,31 @@ def process_data(data):
         return None
     
 def save_file(omiepmd_df):
-    response = False
 
-    # Si el archivo existe, cargar los datos y hacer merge
     if os.path.exists(csv_file_path):
         existing_df = pd.read_csv(csv_file_path)
-        
-        # Unir los datos existentes con el nuevo DataFrame
         merged_df = pd.concat([existing_df, omiepmd_df], ignore_index=True)
-        
         #print("DataFrame inicial:", merged_df.head(25))
         #print("DataFrame inicial:", merged_df.info())
-        # Eliminar duplicados basándose en todas las columnas (o puedes especificar columnas clave)
         merged_df.drop_duplicates(subset=merged_df.columns[1:], inplace=True)# Excluyendo la primera columna de index
-        
-        # Guardar el DataFrame actualizado
         merged_df.to_csv(csv_file_path, index=False, encoding='utf-8')
-        
         print(f"Datos actualizados y guardados en: {csv_file_path}")
     else:
-        # Si no existe el archivo, guardar directamente el DataFrame recibido
         omiepmd_df.to_csv(csv_file_path, index=False, encoding='utf-8')
-        
         print(f"Nuevo archivo guardado en: {csv_file_path}")
-
-    response = True
-    
-    return response
+    return True
 
 def return_price(start_date, end_date, only_spain):
     
-    # Check if the file exists
     if os.path.exists(csv_file_path):
-        # Read the CSV into a DataFrame
         df = pd.read_csv(csv_file_path, parse_dates=['Fecha'])
-        #print("DataFrame inicial:", df.head(300))
-        #print("Información del DataFrame:", df.info())
-
         if not df.empty:
             if only_spain:
                 df = df[['Fecha', 'Hora', 'Horario', 'España']].rename(columns={'España': 'PMD'})
             df_filtered = df[(df['Fecha'] >= start_date) & (df['Fecha'] <= end_date)]
             return df_filtered
         else:
-            print("El archivo no existe.")
+            print("El archivo no tiene datos.")
             return None
     else:
         print("El archivo no existe.")
@@ -170,17 +153,17 @@ def return_price(start_date, end_date, only_spain):
 def return_price_minandmax():
     
     if os.path.exists(csv_file_path):
-        # Leer el CSV en un DataFrame
-        df = pd.read_csv(csv_file_path, parse_dates=['Fecha'])  # Asume que tienes una columna 'Fecha'
-
-        min_date = df['Fecha'].min()
-        max_date = df['Fecha'].max()
-        num_distinct_days = df['Fecha'].nunique()
-        num_total_days = (max_date - min_date).days + 1
-        label_text = f"PMD {min_date.strftime('%d/%m/%Y')}-{max_date.strftime('%d/%m/%Y')}"
-        if num_total_days > num_distinct_days:
-            label_text = f"{label_text}. Con huecos"
-
+        df = pd.read_csv(csv_file_path, parse_dates=['Fecha']) 
+        if not df.empty:
+            min_date = df['Fecha'].min()
+            max_date = df['Fecha'].max()
+            num_distinct_days = df['Fecha'].nunique()
+            num_total_days = (max_date - min_date).days + 1
+            label_text = f"PVPC {min_date.strftime('%d/%m/%Y')}-{max_date.strftime('%d/%m/%Y')}"
+            if num_total_days > num_distinct_days:
+                label_text = f"{label_text}. Con huecos"
+        else:
+            label_text = "El archivo no tiene datos."    
     else:
         label_text = "El archivo no existe."
     
