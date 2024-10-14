@@ -21,7 +21,6 @@ def update_ree():
     #print(f"Comienzo: {time}")
     ####
     
-    # Verificar si el archivo existe
     if os.path.exists(csv_file_path):
         df = pd.read_csv(csv_file_path, parse_dates=['Fecha']) 
         if not df.empty:
@@ -173,11 +172,13 @@ def save_file(pvpc_df):
 
 
 
-def return_price(start_date, end_date):
+def return_price(start_date, end_date, only_peninsula):
     
     if os.path.exists(csv_file_path):
         df = pd.read_csv(csv_file_path, parse_dates=['Fecha'])  # Asume que tienes una columna 'Fecha'
         if not df.empty:
+            if only_peninsula:
+                df = df[['Fecha', 'Hora', 'Horario', 'Península']].rename(columns={'Península': 'PVPC'})
             df_filtered = df[(df['Fecha'] >= start_date) & (df['Fecha'] <= end_date)]
             return df_filtered
         else:
