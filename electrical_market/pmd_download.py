@@ -51,7 +51,6 @@ def update_ree():
     # URL for daily market price indicator (OMIE_PMD - indicator 600)
     omiepmd_url = f"https://api.esios.ree.es/indicators/600?start_date={start_date}T00:00&end_date={end_date}T23:59"
 
-    print(omiepmd_url)
     # Obtain and process daily market data
     omiepmd_data = get_data_from_api(omiepmd_url)
     omiepmd_df = process_data(omiepmd_data)
