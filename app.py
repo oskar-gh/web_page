@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from flask import Flask, render_template, request, send_file, jsonify
 from electrical_market import pmd_download, pvpc_download
 import os
+import pandas as pd
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 
@@ -57,10 +58,11 @@ def electrical_market_index():
     label_text = pmd_download.return_price_minandmax()
     label_text = "-->" + label_text + " --- " + pvpc_download.return_price_minandmax() + "<--"
 
-    #save csv to future downloads
-    csv_file_path = os.path.join('data', 'download.csv')
-    df_PMD.to_csv(csv_file_path, index=False)
-    #print("DataFrame inicial:", df_PVPC.head(30))
+    #save excel to future downloads
+    excel_file_path = os.path.join('data', 'download.xlsx')
+    with pd.ExcelWriter(excel_file_path, engine='xlsxwriter') as writer:
+        df_PMD.to_excel(writer, sheet_name='PMD', index=False)
+        df_PVPC.to_excel(writer, sheet_name='PVPC', index=False)
     
     # Convert to lists for the chart
     PMD_dates = df_PMD.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()
@@ -97,10 +99,10 @@ def electrical_market_index():
                         start_date=start_date, 
                         end_date=end_date)
 
-@app.route('/download_csv')
-def download_csv():
-    csv_file_path = os.path.join(os.getcwd(), 'data', 'download.csv')
-    return send_file(csv_file_path, as_attachment=True)
+@app.route('/download_excel')
+def download_excel():
+    excel_file_path = os.path.join(os.getcwd(), 'data', 'download.xlsx')
+    return send_file(excel_file_path, as_attachment=True)
 
 @app.route('/updateRee')
 def updateRee():
