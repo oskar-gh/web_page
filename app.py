@@ -58,12 +58,6 @@ def electrical_market_index():
     label_text = pmd_download.return_price_minandmax()
     label_text = "-->" + label_text + " --- " + pvpc_download.return_price_minandmax() + "<--"
 
-    #save excel to future downloads
-    excel_file_path = os.path.join('data', 'download.xlsx')
-    with pd.ExcelWriter(excel_file_path, engine='xlsxwriter') as writer:
-        df_PMD.to_excel(writer, sheet_name='PMD', index=False)
-        df_PVPC.to_excel(writer, sheet_name='PVPC', index=False)
-    
     # Convert to lists for the chart
     PMD_dates = df_PMD.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()
     format_dates = []
@@ -71,6 +65,8 @@ def electrical_market_index():
         # format date XX/XX/XXXX 0:00:00 1, for a date without hours
         format_dates.append(f"{datetime.strptime(date_str.split()[0], '%Y-%m-%d').strftime('%d/%m/%Y')} {date_str.split()[2]}")
     PMD_dates = format_dates
+    #The chart format is the same for all prices
+    PMD_prices_data = {country: df_PMD[country].tolist() for country in df_PMD.columns if country not in ['Fecha', 'Hora', 'Horario']}
 
     PVPC_dates = df_PVPC.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()
     format_dates = []
@@ -79,25 +75,48 @@ def electrical_market_index():
         format_dates.append(f"{datetime.strptime(date_str.split()[0], '%Y-%m-%d').strftime('%d/%m/%Y')} {date_str.split()[2]}")
     PVPC_dates = format_dates
     #The chart format is the same for all prices
-    PVPC_dates = PVPC_dates
+    PVPC_prices_data = {systemelec: df_PVPC[systemelec].tolist() for systemelec in df_PVPC.columns if systemelec not in ['Fecha', 'Hora', 'Horario']}
+
+    df_PMD_filtered = df_PMD[['Fecha', 'Hora', 'Horario', 'España']]
+    df_PVPC_filtered = df_PVPC[['Fecha', 'Hora', 'Horario', 'Península']]
+    df_prices = pd.merge(df_PMD_filtered, df_PVPC_filtered, on=['Fecha', 'Hora', 'Horario'], how='inner')
+    df_prices = df_prices.rename(columns={"España": "PMD","Península": "PVPC"})
+    prices_dates = df_prices.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()
+    format_dates = []
+    for date_str in prices_dates:
+        # format date XX/XX/XXXX 0:00:00 1, for a date without hours
+        format_dates.append(f"{datetime.strptime(date_str.split()[0], '%Y-%m-%d').strftime('%d/%m/%Y')} {date_str.split()[2]}")
+    #The chart format is the same for all prices
+    prices_dates = format_dates
+    prices_data = {pricetype: df_prices[pricetype].tolist() for pricetype in df_prices.columns if pricetype not in ['Fecha', 'Hora', 'Horario']}
+
+
+    #save excel to future downloads
+    excel_file_path = os.path.join('data', 'download.xlsx')
+    with pd.ExcelWriter(excel_file_path, engine='xlsxwriter') as writer:
+        df_prices.to_excel(writer, sheet_name='Precios', index=False)
+        df_PMD.to_excel(writer, sheet_name='PMD', index=False)
+        df_PVPC.to_excel(writer, sheet_name='PVPC', index=False)
     
-    #PMD_prices_data = df_PMD['PMD'].tolist() 
-    PMD_prices_data = {type_price: df_PMD[type_price].tolist() for type_price in df_PMD.columns if type_price not in ['Fecha', 'Hora', 'Horario']}
-    PVPC_prices_data = {country: df_PVPC[country].tolist() for country in df_PVPC.columns if country not in ['Fecha', 'Hora', 'Horario']}
        
     # Renderizar la plantilla con los dos DataFrames y datos para el gráfico
     return render_template('electrical_market_index.html', 
+                        start_date=start_date, 
+                        end_date=end_date,
                         label_text=label_text,
-                        register_counter_spainprices = "NumRegistros: " + str(len(df_PMD)),
-                        register_counter_allprices = "NumRegistros: " + str(len(df_PVPC)),
-                        spain_prices=df_PMD.to_html(classes='data', index=False), 
-                        all_prices=df_PVPC.to_html(classes='data', index=False), 
+                        register_counter_prices = "NumRegistros: " + str(len(df_prices)),
+                        register_counter_PMDprices = "NumRegistros: " + str(len(df_PMD)),
+                        register_counter_PVPCprices = "NumRegistros: " + str(len(df_PVPC)),
+                        PMD_prices=df_PMD.to_html(classes='data', index=False), 
                         PMD_dates=PMD_dates, 
                         PMD_prices_data=PMD_prices_data,
+                        PVPC_prices=df_PVPC.to_html(classes='data', index=False), 
                         PVPC_dates=PVPC_dates, 
                         PVPC_prices_data=PVPC_prices_data,
-                        start_date=start_date, 
-                        end_date=end_date)
+                        prices_prices=df_prices.to_html(classes='data', index=False), 
+                        prices_dates=prices_dates, 
+                        prices_data=prices_data
+                        )
 
 @app.route('/download_excel')
 def download_excel():

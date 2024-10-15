@@ -148,8 +148,20 @@
 
     <!-- Tabs for DataFrames and Spain Chart -->
     <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'Prices')">Precios</button>
         <button class="tablinks" onclick="openTab(event, 'PMDPrices')">Precios PMD</button>
         <button class="tablinks" onclick="openTab(event, 'PVPCPrices')">Precios PVPC</button>
+    </div>
+
+    <!-- Tab content for Spain prices and chart -->
+    <div id="Prices" class="tab-content">
+        <div class="chart-container">
+            <canvas id="PricesChart" style="width: 100%; height: 300px;"></canvas>
+        </div>
+        <p id="dynamic-label">{{ register_counter_prices }}</p>
+        <div class="table-container">
+            {{ prices_prices|safe }}
+        </div>
     </div>
 
     <!-- Tab content for Spain prices and chart -->
@@ -157,9 +169,9 @@
         <div class="chart-container">
             <canvas id="PMDPricesChart" style="width: 100%; height: 300px;"></canvas>
         </div>
-        <p id="dynamic-label">{{ register_counter_PMDPrices }}</p>
+        <p id="dynamic-label">{{ register_counter_PMDprices }}</p>
         <div class="table-container">
-            {{ spain_prices|safe }}
+            {{ PMD_prices|safe }}
         </div>
     </div>
 
@@ -168,14 +180,15 @@
         <div class="chart-container">
             <canvas id="PVPCPricesChart" style="width: 100%; height: 300px;"></canvas>
         </div>
-        <p id="dynamic-label">{{ register_counter_PVPCPrices }}</p>
+        <p id="dynamic-label">{{ register_counter_PVPCprices }}</p>
         <div class="table-container">
-            {{ all_prices|safe }}
+            {{ PVPC_prices|safe }}
         </div>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
+        let PricesChart;
         let PMDPricesChart;
         let PVPCPricesChart;
 
@@ -199,41 +212,45 @@
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
 
-            // If the Spain Prices tab is selected, render the chart
+            // If the ALL Prices tab is selected, render the chart
+            if (tabName === 'Prices') {
+                renderPricesChart();
+            }
+
+            // If the PMD Prices tab is selected, render the chart
             if (tabName === 'PMDPrices') {
                 renderPMDPricesChart();
             }
 
-            //If the Spain Prices tab is selected, render the chart
+            //If the PVPC Prices tab is selected, render the chart
             if (tabName === 'PVPCPrices') {
                 renderPVPCPricesChart();
             }
         }
 
-        // Function to render the Chart.js graph for Spain prices
-        function renderPMDPricesChart() {
-            const ctx = document.getElementById('PMDPricesChart').getContext('2d');
+        // Function to render the Chart.js graph for ALL prices
+        function renderPricesChart() {
+            const ctx = document.getElementById('PricesChart').getContext('2d');
 
             // Si ya existe un gráfico, destrúyelo antes de crear uno nuevo
-            if (PVPCPricesChart) {
-                PVPCPricesChart.destroy();
+            if (PricesChart) {
+                PricesChart.destroy();
             }
 
             // Only generate the chart if it hasn't been created yet
-            PVPCPricesChart = new Chart(ctx, {
+            PricesChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: {{ PMD_dates|tojson }},  // Replace with your backend data
+                    labels: {{ prices_dates|tojson }},  // Replace with your backend data
                     datasets: [
-                        {% for price_type, prices in PMD_prices_data.items() %}
+                        {% for pricetype, prices in prices_data.items() %}
                         {
-                            label: '{{ price_type }}',  // Nombre del país
+                            label: '{{ pricetype }}',  // Nombre del país
                             data: {{ prices|tojson }},  // Precios de ese país
                             fill: false,
                             backgroundColor: getRandomColor(),  // Asignar un color aleatorio para cada país
                             borderColor: 'rgba(0, 0, 0, 1)',
-                            borderWidth: 1,
-                            hidden: {% if price_type in ['España'] %} false {% else %} true {% endif %}
+                            borderWidth: 1
                         },
                         {% endfor %}
                     ]
@@ -263,6 +280,60 @@
             });
         }
 
+        // Function to render the Chart.js graph for PMD prices
+        function renderPMDPricesChart() {
+            const ctx = document.getElementById('PMDPricesChart').getContext('2d');
+
+            // Si ya existe un gráfico, destrúyelo antes de crear uno nuevo
+            if (PMDPricesChart) {
+                PMDPricesChart.destroy();
+            }
+
+            // Only generate the chart if it hasn't been created yet
+            PMDPricesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ PMD_dates|tojson }},  // Replace with your backend data
+                    datasets: [
+                        {% for country, prices in PMD_prices_data.items() %}
+                        {
+                            label: '{{ country }}',  // Nombre del país
+                            data: {{ prices|tojson }},  // Precios de ese país
+                            fill: false,
+                            backgroundColor: getRandomColor(),  // Asignar un color aleatorio para cada país
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            borderWidth: 1,
+                            hidden: {% if country in ['España'] %} false {% else %} true {% endif %}
+                        },
+                        {% endfor %}
+                    ]
+                },
+                options: {
+                    responsive: true,  // Asegúrate de que el gráfico sea responsivo
+                    maintainAspectRatio: false, // Mantiene la relación de aspecto
+                    scales: {
+                        x: {
+                            beginAtZero: false,
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Precios'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,  // Mostrar leyenda
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Function to render the Chart.js graph for PVPC prices
         function renderPVPCPricesChart() {
             const ctx = document.getElementById('PVPCPricesChart').getContext('2d');
 
@@ -277,15 +348,15 @@
                 data: {
                     labels: {{ PVPC_dates|tojson }},  // Replace with your backend data
                     datasets: [
-                        {% for country, prices in PVPC_prices_data.items() %}
+                        {% for systemelec, prices in PVPC_prices_data.items() %}
                         {
-                            label: '{{ country }}',  // Nombre del país
+                            label: '{{ systemelec }}',  // Nombre del país
                             data: {{ prices|tojson }},  // Precios de ese país
                             fill: false,
                             backgroundColor: getRandomColor(),  // Asignar un color aleatorio para cada país
                             borderColor: 'rgba(0, 0, 0, 1)',
                             borderWidth: 1,
-                            hidden: {% if country in ['Península'] %} false {% else %} true {% endif %}
+                            hidden: {% if systemelec in ['Península'] %} false {% else %} true {% endif %}
                         },
                         {% endfor %}
                     ]
