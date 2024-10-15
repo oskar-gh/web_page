@@ -52,43 +52,48 @@ def electrical_market_index():
         end_date = request.form.get('end_date')
     
 
-    df_spain = pmd_download.return_price(start_date, end_date, True)
-    df_all = pmd_download.return_price(start_date, end_date, False)
+    df_PMD = pmd_download.return_price(start_date, end_date, False)
+    df_PVPC = pvpc_download.return_price(start_date, end_date, False)
     label_text = pmd_download.return_price_minandmax()
     label_text = "-->" + label_text + " --- " + pvpc_download.return_price_minandmax() + "<--"
 
-    #TODO --> Controlar si no existen ficheros
-    
     #save csv to future downloads
     csv_file_path = os.path.join('data', 'download.csv')
-    df_all.to_csv(csv_file_path, index=False)
-    #print("DataFrame inicial:", df_all.head(30))
+    df_PMD.to_csv(csv_file_path, index=False)
+    #print("DataFrame inicial:", df_PVPC.head(30))
     
     # Convert to lists for the chart
-    spain_dates = df_spain.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()
+    PMD_dates = df_PMD.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()
     format_dates = []
-    for date_str in spain_dates:
+    for date_str in PMD_dates:
         # format date XX/XX/XXXX 0:00:00 1, for a date without hours
         format_dates.append(f"{datetime.strptime(date_str.split()[0], '%Y-%m-%d').strftime('%d/%m/%Y')} {date_str.split()[2]}")
-    spain_dates = format_dates
+    PMD_dates = format_dates
+
+    PVPC_dates = df_PVPC.apply(lambda row: f"{row['Fecha']} {row['Hora']}", axis=1).tolist()
+    format_dates = []
+    for date_str in PVPC_dates:
+        # format date XX/XX/XXXX 0:00:00 1, for a date without hours
+        format_dates.append(f"{datetime.strptime(date_str.split()[0], '%Y-%m-%d').strftime('%d/%m/%Y')} {date_str.split()[2]}")
+    PVPC_dates = format_dates
     #The chart format is the same for all prices
-    all_dates = spain_dates
+    PVPC_dates = PVPC_dates
     
-    #spain_prices_data = df_spain['PMD'].tolist() 
-    spain_prices_data = {type_price: df_spain[type_price].tolist() for type_price in df_spain.columns if type_price not in ['Fecha', 'Hora', 'Horario']}
-    all_prices_data = {country: df_all[country].tolist() for country in df_all.columns if country not in ['Fecha', 'Hora', 'Horario']}
+    #PMD_prices_data = df_PMD['PMD'].tolist() 
+    PMD_prices_data = {type_price: df_PMD[type_price].tolist() for type_price in df_PMD.columns if type_price not in ['Fecha', 'Hora', 'Horario']}
+    PVPC_prices_data = {country: df_PVPC[country].tolist() for country in df_PVPC.columns if country not in ['Fecha', 'Hora', 'Horario']}
        
     # Renderizar la plantilla con los dos DataFrames y datos para el gráfico
     return render_template('electrical_market_index.html', 
                         label_text=label_text,
-                        register_counter_spainprices = "NumRegistros: " + str(len(df_spain)),
-                        register_counter_allprices = "NumRegistros: " + str(len(df_all)),
-                        spain_prices=df_spain.to_html(classes='data', index=False), 
-                        all_prices=df_all.to_html(classes='data', index=False), 
-                        spain_dates=spain_dates, 
-                        spain_prices_data=spain_prices_data,
-                        all_dates=all_dates, 
-                        all_prices_data=all_prices_data,
+                        register_counter_spainprices = "NumRegistros: " + str(len(df_PMD)),
+                        register_counter_allprices = "NumRegistros: " + str(len(df_PVPC)),
+                        spain_prices=df_PMD.to_html(classes='data', index=False), 
+                        all_prices=df_PVPC.to_html(classes='data', index=False), 
+                        PMD_dates=PMD_dates, 
+                        PMD_prices_data=PMD_prices_data,
+                        PVPC_dates=PVPC_dates, 
+                        PVPC_prices_data=PVPC_prices_data,
                         start_date=start_date, 
                         end_date=end_date)
 
