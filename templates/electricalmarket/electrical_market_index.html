@@ -119,11 +119,14 @@
 <body>
     <h1>Precios de Mercado</h1>
 
-    <!-- Botón para regresar a la página principal -->
-    <a href="/" class="home-button" title="Volver a la página principal">
-        <img src="{{ url_for('static', filename='complements/compass.png') }}" alt="Inicio">
-    </a>
-    
+    <div class="container">
+        {% if show_image_return %}
+            <!-- Botón para regresar a la página principal -->
+            <a href="/" class="home-button" title="Volver a la página principal">
+                <img src="{{ url_for('static', filename='complements/compass transparent.png') }}" alt="Inicio">
+            </a>
+        {% endif %}
+    </div>
 
     <!-- Formulario para elegir rango de fechas -->
     <form action="/electrical_market_index" method="POST">
@@ -143,7 +146,7 @@
     </form>
 
     <div id="spinner" style="display:none;">
-        <img src="{{ url_for('static', filename='complements/spinner_compass.gif') }}" alt="Cargando..." />
+        <img src="{{ url_for('static', filename='complements/Compass2.gif') }}" alt="Cargando..." />
     </div>
 
     <!-- Tabs for DataFrames and Spain Chart -->

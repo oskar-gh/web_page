@@ -13,17 +13,17 @@ def index():
 @app.route('/coins_index')
 def coins_index():
     #return render_template('coins/coins_index.html')
-    return render_template('shared/underconstruction.html')
+    return render_template('shared/underconstruction.html', show_image_return = True)
 
 @app.route('/cv_index_spanish')
 def cv_index_spanish():
     #return render_template('cv/cv_index_spanish.html')
-    return render_template('shared/underconstruction.html')
+    return render_template('shared/underconstruction.html', show_image_return = False)
 
 @app.route('/cv_index_english')
 def cv_index_english():
     #return render_template('cv/cv_index_english.html')
-    return render_template('shared/underconstruction.html')
+    return render_template('shared/underconstruction.html', show_image_return = Ture)
 
 ###############################################
 ###############################################
@@ -100,6 +100,7 @@ def electrical_market_index():
        
     # Renderizar la plantilla con los dos DataFrames y datos para el gráfico
     return render_template('electricalmarket/electrical_market_index.html', 
+                        show_image_return = True,
                         start_date=start_date, 
                         end_date=end_date,
                         label_text=label_text,

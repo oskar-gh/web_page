@@ -32,14 +32,35 @@
             font-size: 1.2em;
             color: #555;
         }
+        .home-button {
+            position: fixed; /* Permite que el botón permanezca en su lugar mientras se desplaza */
+            top: 20px;       /* Distancia desde la parte superior de la ventana */
+            right: 20px;     /* Distancia desde el lado derecho de la ventana */
+            background-color: transparent; /* Fondo transparente */
+            border: none;    /* Sin borde */
+            cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+            z-index: 1000;   /* Asegura que esté por encima de otros elementos */
+        }
+        
+        .home-button img {
+            width: 50px; /* Ajusta el tamaño del icono */
+            height: 50px; /* Ajusta el tamaño del icono */
+        }
     </style>
 </head>
 <body>
-    
+
     <div class="container">
+        {% if show_image_return %}
+            <!-- Botón para regresar a la página principal -->
+            <a href="/" class="home-button" title="Volver a la página principal">
+                <img src="{{ url_for('static', filename='complements/compass transparent.png') }}" alt="Inicio">
+            </a>
+        {% endif %}
+
         <img src="{{ url_for('static', filename='complements/compass.png') }}" alt="Inicio">
         <h1>Página en Construcción</h1>
-        <img src="{{ url_for('static', filename='complements/spinner_compass.gif') }}" alt="Página en construcción">
+        <img src="{{ url_for('static', filename='complements/Compass2.gif') }}" alt="Página en construcción">
         <p>Estamos trabajando duro para traerte algo increíble. ¡Vuelve pronto!</p>
     </div>
 </body>
