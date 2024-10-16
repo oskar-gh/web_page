@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Página en Construcción</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+        }
+        .container img {
+            width: 250px;
+            height: auto;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <img src="{{ url_for('static', filename='complements/compass.png') }}" alt="Inicio">
+        <h1>Página en Construcción</h1>
+        <img src="{{ url_for('static', filename='complements/spinner_compass.gif') }}" alt="Página en construcción">
+        <p>Estamos trabajando duro para traerte algo increíble. ¡Vuelve pronto!</p>
+    </div>
+</body>
+</html>
