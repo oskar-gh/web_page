@@ -19,9 +19,8 @@
                         <li><a href="{{ url_for('cv_index_english') }}" target="_blank">English</a></li>
                     </ul>
                 </li>
-                <li><a href="{{ url_for('family_index') }}">Familia</a></li>
                 <li><a href="{{ url_for('coins_index') }}">Colección de monedas</a></li>
-                <li><a href="{{ url_for('electrical_market_index') }}">Ver precios PMD OMIE</a></li>
+                <li><a href="{{ url_for('electrical_market_index') }}">Mercado eléctrico</a></li>
             </ul>
         </nav>
 
@@ -31,10 +30,8 @@
                 <h1>Bienvenido a Mi Página Web</h1>
             </header>
             <main>
-                <p><b>Óscar Heras Bachiller</b>
-                    <br>
-                    <br>
-                    <a>La brújula de mi vida</a>
+                <p><b>La brújula de mi vida</b>
+                    <img src="{{ url_for('static', filename='complements/file.png') }}" alt="Inicio">
                 </p>
             </main>
             <footer>
