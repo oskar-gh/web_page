@@ -23,7 +23,7 @@ def cv_index_spanish():
 @app.route('/cv_index_english')
 def cv_index_english():
     #return render_template('cv/cv_index_english.html')
-    return render_template('shared/underconstruction.html', show_image_return = Ture)
+    return render_template('shared/underconstruction.html', show_image_return = True)
 
 ###############################################
 ###############################################
